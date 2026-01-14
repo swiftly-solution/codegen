@@ -1,0 +1,5 @@
+class Patches
+
+void Apply = string patchName
+void Revert = string patchName
+bool Exists = string patchName

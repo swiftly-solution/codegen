@@ -1,0 +1,5 @@
+*.sln
+obj/
+build/
+bin/
+output/

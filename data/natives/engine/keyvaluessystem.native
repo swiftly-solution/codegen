@@ -1,0 +1,4 @@
+class KeyValuesSystem
+
+uint32 GetSymbolForString = string str
+string GetStringForSymbol = uint32 symbol

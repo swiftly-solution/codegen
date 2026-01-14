@@ -1,0 +1,12 @@
+class Commands
+
+sync int32 HandleCommandForPlayer = int32 playerid, string command // 1 -> not silent, 2 -> silent, -1 -> invalid player, 0 -> no command
+uint64 RegisterCommand = string commandName, ptr callback, bool registerRaw // callback should receive (int32 playerid, string arguments_list (separated by \x01), string commandName, string prefix, bool silent), if registerRaw is false, it will not put "sw_" before the command name
+void UnregisterCommand = uint64 callbackID
+bool IsCommandRegistered = string commandName
+uint64 RegisterAlias = string aliasName, string commandName, bool registerRaw // registerRaw behaves the same as on RegisterCommand, for commandName you need to also put the "sw_" prefix if the command is registered without raw mode
+void UnregisterAlias = uint64 callbackID
+uint64 RegisterClientCommandsListener = ptr callback // callback should receive: int32 playerid, string commandline, return true -> ignored, return false -> supercede
+void UnregisterClientCommandsListener = uint64 callbackID
+uint64 RegisterClientChatListener = ptr callback // callback should receive: int32 playerid, string text, bool teamonly, return true -> ignored, return false -> supercede, when superceded it's not gonna send the message
+void UnregisterClientChatListener = uint64 callbackID

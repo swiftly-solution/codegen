@@ -1,0 +1,4 @@
+class Signatures
+
+bool Exists = string signatureName
+ptr Fetch = string signatureName

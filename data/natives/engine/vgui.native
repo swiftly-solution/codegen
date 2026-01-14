@@ -1,0 +1,8 @@
+class VGUI
+
+uint64 RegisterScreenText = void
+void UnregisterScreenText = uint64 textid
+void ScreenTextCreate = uint64 textid, color col, int32 fontsize, bool drawBackground, bool isMenu
+void ScreenTextSetText = uint64 textid, string text
+void ScreenTextSetColor = uint64 textid, color col
+void ScreenTextSetPosition = uint64 textid, float x, float y // 0.0-1.0, where 0.0 is bottom/left, and 1.0 is top/right

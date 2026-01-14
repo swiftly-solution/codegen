@@ -1,0 +1,14 @@
+class StringTable
+
+ptr ContainerFindTable = string tableName
+ptr ContainerGetTableById = int32 tableId
+int32 GetTableId = ptr table
+string GetTableName = ptr table
+int32 GetNumStrings = ptr table
+int32 FindStringIndex = ptr table, string str
+bool IsStringIndexValid = ptr table, int32 index
+string GetString = ptr table, int32 index
+ptr GetStringUserData = ptr table, int32 index
+bool SetStringUserData = ptr table, int32 index, ptr userData, int32 userDataSize, bool forceOverride
+int32 AddString = ptr table, string str
+bytes Serialize = ptr table, int32 index, string keyName, bool newKey, ptr userData, int32 userDataSize
