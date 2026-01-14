@@ -10,7 +10,8 @@ public class CodeWriter
     private readonly List<string> lines = new();
     private int indentLevel = 0;
     private readonly int spacesPerIndent;
-    private readonly string indentString;
+    private readonly Dictionary<string, string> templates = new();
+    private static readonly Dictionary<string, string> globalTemplates = new();
 
     /// <summary>
     /// Creates a new CodeWriter instance
@@ -19,7 +20,170 @@ public class CodeWriter
     public CodeWriter(int spacesPerIndent = 4)
     {
         this.spacesPerIndent = spacesPerIndent;
-        this.indentString = new string(' ', spacesPerIndent);
+    }
+
+    /// <summary>
+    /// Registers a global template that can be used across all CodeWriter instances
+    /// </summary>
+    /// <param name="key">The template key</param>
+    /// <param name="template">The template content</param>
+    public static void RegisterGlobalTemplate(string key, string template)
+    {
+        globalTemplates[key] = template;
+    }
+
+    /// <summary>
+    /// Registers multiple global templates at once
+    /// </summary>
+    /// <param name="templates">Dictionary of template key-value pairs</param>
+    public static void RegisterGlobalTemplates(Dictionary<string, string> templates)
+    {
+        foreach (var (key, template) in templates)
+        {
+            globalTemplates[key] = template;
+        }
+    }
+
+    /// <summary>
+    /// Clears all global templates
+    /// </summary>
+    public static void ClearGlobalTemplates()
+    {
+        globalTemplates.Clear();
+    }
+
+    /// <summary>
+    /// Registers a template for this CodeWriter instance
+    /// </summary>
+    /// <param name="key">The template key</param>
+    /// <param name="template">The template content</param>
+    public void RegisterTemplate(string key, string template)
+    {
+        templates[key] = template;
+    }
+
+    /// <summary>
+    /// Registers multiple templates for this CodeWriter instance
+    /// </summary>
+    /// <param name="templates">Dictionary of template key-value pairs</param>
+    public void RegisterTemplates(Dictionary<string, string> templates)
+    {
+        foreach (var (key, template) in templates)
+        {
+            this.templates[key] = template;
+        }
+    }
+
+    /// <summary>
+    /// Gets a template by key and replaces placeholders with provided values
+    /// </summary>
+    /// <param name="key">The template key</param>
+    /// <param name="replacements">Dictionary of placeholder-value pairs (e.g., {"$name$", "MyClass"})</param>
+    /// <returns>The processed template with replacements applied</returns>
+    public string GetTemplate(string key, Dictionary<string, string>? replacements = null)
+    {
+        // Try instance templates first, then global templates
+        if (!templates.TryGetValue(key, out var template) && !globalTemplates.TryGetValue(key, out template))
+        {
+            throw new KeyNotFoundException($"Template with key '{key}' not found");
+        }
+
+        if (replacements == null || replacements.Count == 0)
+        {
+            return template;
+        }
+
+        var result = template;
+        foreach (var (placeholder, value) in replacements)
+        {
+            result = result.Replace(placeholder, value);
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Gets a template by key and replaces placeholders using an anonymous object
+    /// </summary>
+    /// <param name="key">The template key</param>
+    /// <param name="replacements">Anonymous object with properties matching placeholders (e.g., new { name = "MyClass" })</param>
+    /// <returns>The processed template with replacements applied</returns>
+    public string GetTemplate(string key, object replacements)
+    {
+        var replacementDict = new Dictionary<string, string>();
+        var properties = replacements.GetType().GetProperties();
+        foreach (var prop in properties)
+        {
+            var value = prop.GetValue(replacements)?.ToString() ?? "";
+            replacementDict[$"${prop.Name}$"] = value;
+        }
+        return GetTemplate(key, replacementDict);
+    }
+
+    /// <summary>
+    /// Adds a template to the code with replacements
+    /// </summary>
+    /// <param name="key">The template key</param>
+    /// <param name="replacements">Dictionary of placeholder-value pairs</param>
+    public void AddTemplate(string key, Dictionary<string, string>? replacements = null)
+    {
+        var processed = GetTemplate(key, replacements);
+        var templateLines = processed.Split(["\r\n", "\n"], StringSplitOptions.None);
+        AddLines(templateLines);
+    }
+
+    /// <summary>
+    /// Adds a template to the code with replacements using an anonymous object
+    /// </summary>
+    /// <param name="key">The template key</param>
+    /// <param name="replacements">Anonymous object with properties matching placeholders</param>
+    public void AddTemplate(string key, object replacements)
+    {
+        var processed = GetTemplate(key, replacements);
+        var templateLines = processed.Split(["\r\n", "\n"], StringSplitOptions.None);
+        AddLines(templateLines);
+    }
+
+    /// <summary>
+    /// Loads a template from a file and registers it
+    /// </summary>
+    /// <param name="key">The template key</param>
+    /// <param name="filePath">Path to the template file</param>
+    public async Task LoadTemplateFromFileAsync(string key, string filePath)
+    {
+        var content = await File.ReadAllTextAsync(filePath);
+        RegisterTemplate(key, content);
+    }
+
+    /// <summary>
+    /// Loads a template from a file and registers it synchronously
+    /// </summary>
+    /// <param name="key">The template key</param>
+    /// <param name="filePath">Path to the template file</param>
+    public void LoadTemplateFromFile(string key, string filePath)
+    {
+        var content = File.ReadAllText(filePath);
+        RegisterTemplate(key, content);
+    }
+
+    /// <summary>
+    /// Loads all templates from a directory
+    /// </summary>
+    /// <param name="directoryPath">Path to the directory containing template files</param>
+    /// <param name="searchPattern">File search pattern (default: "*.template")</param>
+    /// <param name="useFileNameAsKey">If true, uses filename without extension as key</param>
+    public async Task LoadTemplatesFromDirectoryAsync(string directoryPath, string searchPattern = "*.template", bool useFileNameAsKey = true)
+    {
+        if (!Directory.Exists(directoryPath))
+        {
+            throw new DirectoryNotFoundException($"Template directory not found: {directoryPath}");
+        }
+
+        var files = Directory.GetFiles(directoryPath, searchPattern);
+        foreach (var file in files)
+        {
+            var key = useFileNameAsKey ? Path.GetFileNameWithoutExtension(file) : Path.GetFileName(file);
+            await LoadTemplateFromFileAsync(key, file);
+        }
     }
 
     /// <summary>

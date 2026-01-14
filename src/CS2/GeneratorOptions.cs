@@ -12,7 +12,8 @@ public static class GeneratorOptions
     /// </summary>
     private static readonly Dictionary<string, BaseGenerator> Generators = new()
     {
-        { "Natives", new Natives() }
+        { "Natives", new Natives() },
+        { "Game Events", new GameEvents() }
     };
 
     public static async Task ShowGeneratorOptionsAsync()
