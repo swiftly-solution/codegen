@@ -217,7 +217,7 @@ public class Natives : BaseGenerator
         }
 
         var stringParams = nativeParams.Where(p => p.type == "string").Select(p => p.name).ToList();
-        var bytesParams = nativeParams.Where(p => p.type == "byte[]").Select(p => p.name).ToList();
+        var bytesParams = nativeParams.Where(p => p.type == "bytes").Select(p => p.name).ToList();
         var poolDeclared = false;
 
         // string params
@@ -286,7 +286,7 @@ public class Natives : BaseGenerator
         {
             // First call to get buffer size
             var firstCallArgs = new List<string> { "null" };
-            firstCallArgs.AddRange(BuildCallArgs(nativeParams, stringParams, bytesParams));
+            firstCallArgs.AddRange(BuildCallArgs(nativeParams));
             writer.AddLine($"var ret = _{functionName}({string.Join(", ", firstCallArgs)});");
 
             if (!poolDeclared)
@@ -299,7 +299,7 @@ public class Natives : BaseGenerator
             writer.AddBlock("fixed (byte* retBufferPtr = retBuffer)", () =>
             {
                 var secondCallArgs = new List<string> { "retBufferPtr" };
-                secondCallArgs.AddRange(BuildCallArgs(nativeParams, stringParams, bytesParams));
+                secondCallArgs.AddRange(BuildCallArgs(nativeParams));
                 writer.AddLine($"ret = _{functionName}({string.Join(", ", secondCallArgs)});");
 
                 if (returnType == "string")
@@ -327,7 +327,7 @@ public class Natives : BaseGenerator
         }
         else
         {
-            var callArgs = BuildCallArgs(nativeParams, stringParams, bytesParams);
+            var callArgs = BuildCallArgs(nativeParams);
 
             if (returnType == "void")
             {
@@ -357,7 +357,7 @@ public class Natives : BaseGenerator
         }
     }
 
-    private List<string> BuildCallArgs(List<(string type, string name)> nativeParams, List<string> stringParams, List<string> bytesParams)
+    private List<string> BuildCallArgs(List<(string type, string name)> nativeParams)
     {
         var args = new List<string>();
         foreach (var (type, name) in nativeParams)
@@ -366,8 +366,8 @@ public class Natives : BaseGenerator
             {
                 args.Add($"{name}BufferPtr");
             }
-            else if (type == "byte[]")
-            {
+            else if (type == "bytes")
+      {
                 args.Add($"{name}BufferPtr");
                 args.Add($"{name}Length");
             }
