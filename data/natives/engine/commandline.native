@@ -1,9 +1,0 @@
-class CommandLine
-
-bool HasParameter = string parameter
-int32 GetParameterCount = void
-string GetParameterValueString = string parameter, string defaultValue
-int32 GetParameterValueInt = string parameter, int32 defaultValue
-float GetParameterValueFloat = string parameter, float defaultValue
-string GetCommandLine = void
-bool HasParameters = void

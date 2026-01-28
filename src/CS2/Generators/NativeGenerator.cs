@@ -56,6 +56,15 @@ public class Natives : BaseGenerator
         };
     }
 
+    /// <summary>
+    /// Initializes a new instance of the Natives generator
+    /// </summary>
+    /// <param name="dataPath">Optional custom path to the natives folder</param>
+    public Natives(string? dataPath = null)
+    {
+        DataPath = dataPath;
+    }
+
     /// <inheritdoc />
     public override string Name => "Natives";
 
@@ -67,9 +76,11 @@ public class Natives : BaseGenerator
     {
         try
         {
-            var nativesDir = Path.Combine(Entrypoint.ProjectRootPath, "data", "natives");
+            Progress.Report("Locating natives directory...");
+            var nativesDir = DataPath ?? Path.Combine(Entrypoint.ProjectRootPath, "data", "natives");
             if (!Directory.Exists(nativesDir))
             {
+                Progress.Report($"Directory not found: {nativesDir}");
                 return new GeneratorResult
                 {
                     Success = false,
@@ -77,24 +88,31 @@ public class Natives : BaseGenerator
                 };
             }
 
+            Progress.Report($"Found natives directory: {Path.GetFileName(nativesDir)}");
             var outputDir = OutputPath;
             if (Directory.Exists(outputDir))
             {
+                Progress.Report("Cleaning output directory...");
                 Directory.Delete(outputDir, true);
             }
             Directory.CreateDirectory(outputDir);
 
             var nativeFiles = Directory.GetFiles(nativesDir, "*.native", SearchOption.AllDirectories);
+            Progress.Report($"Found {nativeFiles.Length} native file(s)");
 
-            foreach (var nativeFile in nativeFiles)
+            for (int i = 0; i < nativeFiles.Length; i++)
             {
-                await ParseNativeFileAsync(nativeFile, outputDir);
+                var fileName = Path.GetFileName(nativeFiles[i]);
+                Progress.Report($"Processing {fileName} ({i + 1}/{nativeFiles.Length})...");
+                await ParseNativeFileAsync(nativeFiles[i], outputDir);
             }
 
+            Progress.Report($"Successfully generated {nativeFiles.Length} native file(s)");
             return new GeneratorResult { Success = true };
         }
         catch (Exception ex)
         {
+            Progress.Report($"Error: {ex.Message}");
             return new GeneratorResult
             {
                 Success = false,
@@ -367,7 +385,7 @@ public class Natives : BaseGenerator
                 args.Add($"{name}BufferPtr");
             }
             else if (type == "bytes")
-      {
+            {
                 args.Add($"{name}BufferPtr");
                 args.Add($"{name}Length");
             }

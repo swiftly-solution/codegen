@@ -36,6 +36,15 @@ public class GameEvents : BaseGenerator
 
     private readonly List<uint> hashes = new();
 
+    /// <summary>
+    /// Initializes a new instance of the GameEvents generator
+    /// </summary>
+    /// <param name="dataPath">Optional custom path to the game events folder</param>
+    public GameEvents(string? dataPath = null)
+    {
+        DataPath = dataPath;
+    }
+
     /// <inheritdoc />
     public override string Name => "Game Events";
 
@@ -47,16 +56,21 @@ public class GameEvents : BaseGenerator
     {
         try
         {
-            var gameEventsDir = Path.Combine(Entrypoint.ProjectRootPath, "data", "gameevents");
+            Progress.Report("Initializing game events generation...");
+            var gameEventsDir = DataPath ?? Path.Combine(Entrypoint.ProjectRootPath, "data", "gameevents");
             Directory.CreateDirectory(gameEventsDir);
 
+            Progress.Report("Downloading game events files...");
             await DownloadGameEventsAsync(gameEventsDir);
 
+            Progress.Report("Parsing game events...");
             var allEvents = await ParseAllGameEventsAsync(gameEventsDir);
+            Progress.Report($"Parsed {allEvents.Count} game event(s)");
 
             var interfacesDir = Path.Combine(OutputPath, "Interfaces");
             var classesDir = Path.Combine(OutputPath, "Classes");
 
+            Progress.Report("Preparing output directories...");
             if (Directory.Exists(interfacesDir))
                 Directory.Delete(interfacesDir, true);
             if (Directory.Exists(classesDir))
@@ -65,16 +79,24 @@ public class GameEvents : BaseGenerator
             Directory.CreateDirectory(interfacesDir);
             Directory.CreateDirectory(classesDir);
 
+            int count = 0;
             foreach (var ev in allEvents.Values)
             {
+                count++;
+                if (count % 10 == 0 || count == allEvents.Count)
+                {
+                    Progress.Report($"Generating events ({count}/{allEvents.Count})...");
+                }
                 GenerateInterface(ev, interfacesDir);
                 GenerateClass(ev, classesDir);
             }
 
+            Progress.Report($"Successfully generated {allEvents.Count} game event(s)");
             return new GeneratorResult { Success = true };
         }
         catch (Exception ex)
         {
+            Progress.Report($"Error: {ex.Message}");
             return new GeneratorResult
             {
                 Success = false,
@@ -93,11 +115,14 @@ public class GameEvents : BaseGenerator
             { "mod.gameevents", "https://raw.githubusercontent.com/SteamDatabase/GameTracking-CS2/master/game/csgo/pak01_dir/resource/mod.gameevents" }
         };
 
+        int count = 0;
         foreach (var (filename, url) in files)
         {
+            count++;
             var filePath = Path.Combine(outputDir, filename);
             try
             {
+                Progress.Report($"Downloading {filename} ({count}/{files.Count})...");
                 var content = await httpClient.GetStringAsync(url);
                 await File.WriteAllTextAsync(filePath, content);
             }
@@ -107,6 +132,7 @@ public class GameEvents : BaseGenerator
                 {
                     throw new Exception($"Failed to download {filename} and no local file exists: {ex.Message}");
                 }
+                Progress.Report($"Using cached {filename}");
             }
         }
     }
