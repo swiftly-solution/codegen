@@ -10,13 +10,14 @@ public static class GeneratorOptions
     /// <summary>
     /// Dictionary of available generators mapped by their display name
     /// </summary>
-    private static readonly Dictionary<string, Func<string?, string?, BaseGenerator>> GeneratorFactories = new()
+    private static readonly Dictionary<string, Func<string?, string?, string?, BaseGenerator>> GeneratorFactories = new()
     {
-        { "Natives", (nativesPath, _) => new Natives(nativesPath) },
-        { "Game Events", (_, gameEventsPath) => new GameEvents(gameEventsPath) }
+        { "Natives", (nativesPath, _, _) => new Natives(nativesPath) },
+        { "Game Events", (_, gameEventsPath, _) => new GameEvents(gameEventsPath) },
+        { "Protobufs", (_, _, protobufsPath) => new Protobufs(protobufsPath) }
     };
 
-    public static async Task ShowGeneratorOptionsAsync(string? nativesPath, string? gameEventsPath)
+    public static async Task ShowGeneratorOptionsAsync(string? nativesPath, string? gameEventsPath, string? protobufsPath = null)
     {
         var selectedGenerators = AnsiConsole.Prompt(
             new MultiSelectionPrompt<string>()
@@ -74,12 +75,32 @@ public static class GeneratorOptions
             }
         }
 
+        if (selectedGenerators.Contains("Protobufs") && string.IsNullOrEmpty(protobufsPath))
+        {
+            var defaultProtobufsPath = Path.Combine(Entrypoint.ProjectRootPath, "protobufs", "cs2");
+            if (Directory.Exists(defaultProtobufsPath))
+            {
+                var useDefault = AnsiConsole.Confirm($"Use default protobufs path: [grey]{defaultProtobufsPath}[/]?", true);
+                if (useDefault)
+                {
+                    protobufsPath = defaultProtobufsPath;
+                }
+            }
+
+            if (string.IsNullOrEmpty(protobufsPath))
+            {
+                AnsiConsole.MarkupLine("[yellow]Please select the protobufs folder:[/]");
+                protobufsPath = Entrypoint.BrowseForDirectory("Browse for Protobufs Folder", Entrypoint.ProjectRootPath);
+                AnsiConsole.MarkupLine($"[green]Selected protobufs path:[/] {protobufsPath}");
+            }
+        }
+
         AnsiConsole.WriteLine();
         var startTime = DateTime.Now;
 
         var generators = selectedGenerators.ToDictionary(
             name => name,
-            name => GeneratorFactories[name](nativesPath, gameEventsPath)
+            name => GeneratorFactories[name](nativesPath, gameEventsPath, protobufsPath)
         );
 
         var generatorStatus = new Dictionary<string, GeneratorState>();

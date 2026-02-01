@@ -35,6 +35,7 @@ public static class Entrypoint
         // Parse command-line arguments
         string? nativesPath = null;
         string? gameEventsPath = null;
+        string? protobufsPath = null;
 
         for (int i = 0; i < args.Length; i++)
         {
@@ -46,6 +47,11 @@ public static class Entrypoint
             else if ((args[i] == "--gameevents-path" || args[i] == "-g") && i + 1 < args.Length)
             {
                 gameEventsPath = args[i + 1];
+                i++;
+            }
+            else if ((args[i] == "--protobufs-path" || args[i] == "-p") && i + 1 < args.Length)
+            {
+                protobufsPath = args[i + 1];
                 i++;
             }
             else if (args[i] == "--help" || args[i] == "-h")
@@ -66,7 +72,7 @@ public static class Entrypoint
         switch (gameChoice)
         {
             case "Counter-Strike: 2":
-                await CS2.GeneratorOptions.ShowGeneratorOptionsAsync(nativesPath, gameEventsPath);
+                await CS2.GeneratorOptions.ShowGeneratorOptionsAsync(nativesPath, gameEventsPath, protobufsPath);
                 break;
             default:
                 AnsiConsole.MarkupLine("[red]Error:[/] Unknown game selected.");

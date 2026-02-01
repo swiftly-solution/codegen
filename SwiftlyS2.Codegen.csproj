@@ -28,6 +28,7 @@
   <ItemGroup>
     <PackageReference Include="Spectre.Console" Version="0.54.0" />
     <PackageReference Include="WordNinjaSharp" Version="1.0.0" />
+    <PackageReference Include="protobuf-net.Reflection" Version="3.2.52" />
   </ItemGroup>
 
   <ItemGroup>
