@@ -10,14 +10,15 @@ public static class GeneratorOptions
     /// <summary>
     /// Dictionary of available generators mapped by their display name
     /// </summary>
-    private static readonly Dictionary<string, Func<string?, string?, string?, BaseGenerator>> GeneratorFactories = new()
+    private static readonly Dictionary<string, Func<string?, string?, string?, string?, BaseGenerator>> GeneratorFactories = new()
     {
-        { "Natives", (nativesPath, _, _) => new Natives(nativesPath) },
-        { "Game Events", (_, gameEventsPath, _) => new GameEvents(gameEventsPath) },
-        { "Protobufs", (_, _, protobufsPath) => new Protobufs(protobufsPath) }
+        { "Natives", (nativesPath, _, _, _) => new Natives(nativesPath) },
+        { "Game Events", (_, gameEventsPath, _, _) => new GameEvents(gameEventsPath) },
+        { "Protobufs", (_, _, protobufsPath, _) => new Protobufs(protobufsPath) },
+        { "Datamaps", (_, _, _, datamapsPath) => new Datamaps(datamapsPath!) }
     };
 
-    public static async Task ShowGeneratorOptionsAsync(string? nativesPath, string? gameEventsPath, string? protobufsPath = null)
+    public static async Task ShowGeneratorOptionsAsync(string? nativesPath, string? gameEventsPath, string? protobufsPath = null, string? datamapsPath = null)
     {
         var selectedGenerators = AnsiConsole.Prompt(
             new MultiSelectionPrompt<string>()
@@ -95,12 +96,32 @@ public static class GeneratorOptions
             }
         }
 
+        if (selectedGenerators.Contains("Datamaps") && string.IsNullOrEmpty(datamapsPath))
+        {
+            var defaultDatamapsPath = Path.Combine(Entrypoint.ProjectRootPath, "datamaps.json");
+            if (File.Exists(defaultDatamapsPath))
+            {
+                var useDefault = AnsiConsole.Confirm($"Use default datamaps file: [grey]{defaultDatamapsPath}[/]?", true);
+                if (useDefault)
+                {
+                    datamapsPath = defaultDatamapsPath;
+                }
+            }
+
+            if (string.IsNullOrEmpty(datamapsPath))
+            {
+                AnsiConsole.MarkupLine("[yellow]Please browse for datamaps.json file:[/]");
+                datamapsPath = Entrypoint.BrowseForFile("Browse for datamaps.json", Entrypoint.ProjectRootPath, ".json");
+                AnsiConsole.MarkupLine($"[green]Selected datamaps path:[/] {datamapsPath}");
+            }
+        }
+
         AnsiConsole.WriteLine();
         var startTime = DateTime.Now;
 
         var generators = selectedGenerators.ToDictionary(
             name => name,
-            name => GeneratorFactories[name](nativesPath, gameEventsPath, protobufsPath)
+            name => GeneratorFactories[name](nativesPath, gameEventsPath, protobufsPath, datamapsPath)
         );
 
         var generatorStatus = new Dictionary<string, GeneratorState>();

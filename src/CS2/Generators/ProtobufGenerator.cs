@@ -14,6 +14,51 @@ public class Protobufs : BaseGenerator
     private readonly HashSet<string> _explicitProtoFiles = new();
     private FileDescriptorSet? _fileSet;
 
+    /// <summary>
+    /// Types to skip during generation. Add any message names here that you don't want generated.
+    /// This is useful for excluding Google protobuf descriptor types and other unwanted messages.
+    /// </summary>
+    private static readonly HashSet<string> SkipTypes = new()
+    {
+        "FileDescriptorSet",
+        "FileDescriptorProto",
+        "DescriptorProto",
+        "FieldDescriptorProto",
+        "OneofDescriptorProto",
+        "EnumDescriptorProto",
+        "EnumValueDescriptorProto",
+        "ServiceDescriptorProto",
+        "MethodDescriptorProto",
+        "FileOptions",
+        "MessageOptions",
+        "FieldOptions",
+        "OneofOptions",
+        "EnumOptions",
+        "EnumValueOptions",
+        "ServiceOptions",
+        "MethodOptions",
+        "UninterpretedOption",
+        "SourceCodeInfo",
+        "GeneratedCodeInfo",
+        "Duration",
+        "Timestamp",
+        "Any",
+        "Empty",
+        "Struct",
+        "Value",
+        "ListValue",
+        "NullValue",
+        "DoubleValue",
+        "FloatValue",
+        "Int64Value",
+        "UInt64Value",
+        "Int32Value",
+        "UInt32Value",
+        "BoolValue",
+        "StringValue",
+        "BytesValue",
+    };
+
     private static readonly Dictionary<string, (string Prefix, string MessagePrefix)> NetMessageEnums = new()
     {
         { "EBaseUserMessages", ("UM_", "CUserMessage") },
@@ -51,111 +96,6 @@ public class Protobufs : BaseGenerator
         { "CMsgRGBA", "Color" }
     };
 
-    private const string FieldTemplate = @"
-  public $CSTYPE$ $CSNAME$
-  { get => Accessor.Get$TYPE$(""$NAME$""); set => Accessor.Set$TYPE$(""$NAME$"", value); }
-";
-
-    private const string EnumFieldTemplate = @"
-  public $CSTYPE$ $CSNAME$
-  { get => ($CSTYPE$)Accessor.GetInt32(""$NAME$""); set => Accessor.SetInt32(""$NAME$"", (int)value); }
-";
-
-    private const string NestedFieldTemplate = @"
-  public $TYPE$ $CSNAME$
-  { get => new $TYPE$Impl(NativeNetMessages.GetNestedMessage(Address, ""$NAME$""), false); }
-";
-
-    private const string RepeatedFieldTemplate = @"
-  public $CSTYPE$ $CSNAME$
-  { get => new $CSTYPE_IMPL$(Accessor, ""$NAME$""); }
-";
-
-    private const string InterfaceFieldTemplate = @"
-  public $CSTYPE$ $CSNAME$ { get; set; }
-";
-
-    private const string InterfaceReadonlyFieldTemplate = @"
-  public $CSTYPE$ $CSNAME$ { get; }
-";
-
-    private const string ImplClassTemplate = @"using SwiftlyS2.Core.Natives;
-using SwiftlyS2.Core.NetMessages;
-using SwiftlyS2.Shared.Natives;
-using SwiftlyS2.Shared.NetMessages;
-using SwiftlyS2.Shared.ProtobufDefinitions;
-
-namespace SwiftlyS2.Core.ProtobufDefinitions;
-
-internal class $NAME$ : $BASE_CLASS$<$INTERFACE$>, $INTERFACE$
-{
-  public $NAME$(nint handle, bool isManuallyAllocated): base(handle)
-  {
-  }
-
-$FIELDS$
-}
-";
-
-    private const string NetMessageImplClassTemplate = @"using SwiftlyS2.Core.Natives;
-using SwiftlyS2.Core.NetMessages;
-using SwiftlyS2.Shared.Natives;
-using SwiftlyS2.Shared.NetMessages;
-using SwiftlyS2.Shared.ProtobufDefinitions;
-
-namespace SwiftlyS2.Core.ProtobufDefinitions;
-
-internal class $NAME$ : $BASE_CLASS$<$INTERFACE$>, $INTERFACE$
-{
-  public $NAME$(nint handle, bool isManuallyAllocated): base(handle, isManuallyAllocated)
-  {
-  }
-
-$FIELDS$
-}
-";
-
-    private const string NetMessageInterfaceTemplate = @"using SwiftlyS2.Core.ProtobufDefinitions;
-using SwiftlyS2.Shared.Natives;
-using SwiftlyS2.Shared.NetMessages;
-
-namespace SwiftlyS2.Shared.ProtobufDefinitions;
-using SwiftlyS2.Shared.NetMessages;
-
-public interface $NAME$ : ITypedProtobuf<$NAME$>, INetMessage<$NAME$>, IDisposable
-{
-  static int INetMessage<$NAME$>.MessageId => $MESSAGE_ID$;
-  
-  static string INetMessage<$NAME$>.MessageName => ""$MESSAGE_NAME$"";
-
-  static $NAME$ ITypedProtobuf<$NAME$>.Wrap(nint handle, bool isManuallyAllocated) => new $NAME$Impl(handle, isManuallyAllocated);
-
-$FIELDS$
-}
-";
-
-    private const string NonNetMessageInterfaceTemplate = @"using SwiftlyS2.Core.ProtobufDefinitions;
-using SwiftlyS2.Shared.Natives;
-using SwiftlyS2.Shared.NetMessages;
-
-namespace SwiftlyS2.Shared.ProtobufDefinitions;
-
-public interface $NAME$ : ITypedProtobuf<$NAME$>
-{
-  static $NAME$ ITypedProtobuf<$NAME$>.Wrap(nint handle, bool isManuallyAllocated) => new $NAME$Impl(handle, isManuallyAllocated);
-
-$FIELDS$
-}
-";
-
-    private const string EnumTemplate = @"namespace SwiftlyS2.Shared.ProtobufDefinitions;
-
-public enum $NAME$
-{
-$FIELDS$
-}
-";
-
     /// <summary>
     /// Initializes a new instance of the Protobufs generator
     /// </summary>
@@ -192,6 +132,13 @@ $FIELDS$
                     Success = false,
                     ErrorMessage = $"Protobufs path not found: {_protobufsPath}"
                 };
+            }
+
+            Progress.Report("Preparing output directories...");
+
+            if (Directory.Exists(OutputPath))
+            {
+                Directory.Delete(OutputPath, true);
             }
 
             var outInterfaces = Path.Combine(OutputPath, "Interfaces");
@@ -270,6 +217,12 @@ $FIELDS$
         foreach (var enumProto in enums)
         {
             var enumName = prefix + enumProto.Name;
+
+            if (SkipTypes.Contains(enumName))
+            {
+                continue;
+            }
+
             _allEnumNames.Add(enumName);
             WriteEnum(enumProto, outEnums, prefix);
         }
@@ -280,6 +233,13 @@ $FIELDS$
         ProcessEnumsRecursive(message.EnumTypes, outEnums, prefix);
         foreach (var nestedMessage in message.NestedTypes)
         {
+            var nestedName = prefix + nestedMessage.Name;
+
+            if (SkipTypes.Contains(nestedName))
+            {
+                continue;
+            }
+
             ProcessMessageEnums(nestedMessage, outEnums, prefix + nestedMessage.Name + "_");
         }
     }
@@ -357,22 +317,27 @@ $FIELDS$
     private void WriteEnum(EnumDescriptorProto enumProto, string outEnums, string prefix)
     {
         var enumName = prefix + enumProto.Name;
-        var fields = new StringBuilder();
+        var writer = new CodeWriter();
 
-        foreach (var field in enumProto.Values)
+        writer.AddLine("namespace SwiftlyS2.Shared.ProtobufDefinitions;");
+        writer.AddLine();
+        writer.AddBlock($"public enum {enumName}", () =>
         {
-            fields.AppendLine($"  {field.Name} = {field.Number},");
-        }
+            foreach (var field in enumProto.Values)
+            {
+                writer.AddLine($"{field.Name} = {field.Number},");
+            }
+        });
 
-        var content = EnumTemplate
-            .Replace("$NAME$", enumName)
-            .Replace("$FIELDS$", fields.ToString().TrimEnd());
-
-        File.WriteAllText(Path.Combine(outEnums, $"{enumName}.cs"), content);
+        File.WriteAllText(Path.Combine(outEnums, $"{enumName}.cs"), writer.ToString());
     }
 
     private void WriteNetMessage(DescriptorProto message, string outInterfaces, string outClasses, int messageId, string prefix = "")
     {
+        var className = prefix + message.Name;
+        // Skip types listed in SkipTypes
+        if (SkipTypes.Contains(className)) return;
+
         var fields = new List<string>();
         var interfaceFields = new List<string>();
 
@@ -389,28 +354,83 @@ $FIELDS$
             WriteNetMessage(nestedMessage, outInterfaces, outClasses, -1, prefix + message.Name + "_");
         }
 
-        var className = prefix + message.Name + "Impl";
+        var classNameImpl = prefix + message.Name + "Impl";
         var interfaceName = prefix + message.Name;
 
         // Write implementation class
-        var implTemplate = messageId != -1 ? NetMessageImplClassTemplate : ImplClassTemplate;
-        var implContent = implTemplate
-            .Replace("$NAME$", className)
-            .Replace("$BASE_CLASS$", messageId != -1 ? "NetMessage" : "TypedProtobuf")
-            .Replace("$INTERFACE$", interfaceName)
-            .Replace("$FIELDS$", string.Join("\n", fields).TrimEnd());
-
-        File.WriteAllText(Path.Combine(outClasses, $"{className}.cs"), implContent);
+        var implWriter = new CodeWriter();
+        WriteImplClass(implWriter, classNameImpl, interfaceName, fields, messageId);
+        File.WriteAllText(Path.Combine(outClasses, $"{classNameImpl}.cs"), implWriter.ToString());
 
         // Write interface
-        var interfaceTemplate = messageId != -1 ? NetMessageInterfaceTemplate : NonNetMessageInterfaceTemplate;
-        var interfaceContent = interfaceTemplate
-            .Replace("$NAME$", interfaceName)
-            .Replace("$MESSAGE_ID$", messageId.ToString())
-            .Replace("$MESSAGE_NAME$", interfaceName)
-            .Replace("$FIELDS$", string.Join("\n", interfaceFields).TrimEnd());
+        var interfaceWriter = new CodeWriter();
+        WriteInterface(interfaceWriter, interfaceName, interfaceFields, messageId);
+        File.WriteAllText(Path.Combine(outInterfaces, $"{interfaceName}.cs"), interfaceWriter.ToString());
+    }
 
-        File.WriteAllText(Path.Combine(outInterfaces, $"{interfaceName}.cs"), interfaceContent);
+    private void WriteImplClass(CodeWriter writer, string className, string interfaceName, List<string> fields, int messageId)
+    {
+        writer.AddLine("using SwiftlyS2.Core.Natives;");
+        writer.AddLine("using SwiftlyS2.Core.NetMessages;");
+        writer.AddLine("using SwiftlyS2.Shared.Natives;");
+        writer.AddLine("using SwiftlyS2.Shared.NetMessages;");
+        writer.AddLine("using SwiftlyS2.Shared.ProtobufDefinitions;");
+        writer.AddLine();
+        writer.AddLine("namespace SwiftlyS2.Core.ProtobufDefinitions;");
+        writer.AddLine();
+
+        var baseClass = messageId != -1 ? "NetMessage" : "TypedProtobuf";
+        writer.AddBlock($"internal class {className} : {baseClass}<{interfaceName}>, {interfaceName}", () =>
+        {
+            writer.AddBlock($"public {className}(nint handle, bool isManuallyAllocated) : base(handle{(messageId != -1 ? ", isManuallyAllocated" : "")})", () => { });
+            writer.AddLine();
+
+            foreach (var field in fields)
+            {
+                writer.AddLines(field.Split('\n'));
+            }
+        });
+    }
+
+    private void WriteInterface(CodeWriter writer, string interfaceName, List<string> fields, int messageId)
+    {
+        writer.AddLine("using SwiftlyS2.Core.ProtobufDefinitions;");
+        writer.AddLine("using SwiftlyS2.Shared.Natives;");
+        writer.AddLine("using SwiftlyS2.Shared.NetMessages;");
+        writer.AddLine();
+        writer.AddLine("namespace SwiftlyS2.Shared.ProtobufDefinitions;");
+        writer.AddLine();
+
+        if (messageId != -1)
+        {
+            writer.AddBlock($"public interface {interfaceName} : ITypedProtobuf<{interfaceName}>, INetMessage<{interfaceName}>, IDisposable", () =>
+            {
+                writer.AddLine($"static int INetMessage<{interfaceName}>.MessageId => {messageId};");
+                writer.AddLine();
+                writer.AddLine($"static string INetMessage<{interfaceName}>.MessageName => \"{interfaceName}\";");
+                writer.AddLine();
+                writer.AddLine($"static {interfaceName} ITypedProtobuf<{interfaceName}>.Wrap(nint handle, bool isManuallyAllocated) => new {interfaceName}Impl(handle, isManuallyAllocated);");
+                writer.AddLine();
+
+                foreach (var field in fields)
+                {
+                    writer.AddLines(field.Split('\n'));
+                }
+            });
+        }
+        else
+        {
+            writer.AddBlock($"public interface {interfaceName} : ITypedProtobuf<{interfaceName}>", () =>
+            {
+                writer.AddLine($"static {interfaceName} ITypedProtobuf<{interfaceName}>.Wrap(nint handle, bool isManuallyAllocated) => new {interfaceName}Impl(handle, isManuallyAllocated);");
+                writer.AddLine();
+
+                foreach (var field in fields)
+                {
+                    writer.AddLines(field.Split('\n'));
+                }
+            });
+        }
     }
 
     private (string implField, string interfaceField) GetFieldTemplate(FieldDescriptorProto field)
@@ -426,15 +446,8 @@ $FIELDS$
         // Check if it's an enum
         if (_allEnumNames.Contains(fieldType))
         {
-            var content = EnumFieldTemplate
-                .Replace("$CSTYPE$", fieldType)
-                .Replace("$CSNAME$", csName)
-                .Replace("$NAME$", fieldName);
-
-            var interfaceContent = InterfaceFieldTemplate
-                .Replace("$CSTYPE$", fieldType)
-                .Replace("$CSNAME$", csName);
-
+            var content = $"public {fieldType} {csName}\n{{ get => ({fieldType})Accessor.GetInt32(\"{fieldName}\"); set => Accessor.SetInt32(\"{fieldName}\", (int)value); }}";
+            var interfaceContent = $"public {fieldType} {csName} {{ get; set; }}";
             return (content, interfaceContent);
         }
 
@@ -448,29 +461,15 @@ $FIELDS$
 
             if (isRepeated)
             {
-                var content = RepeatedFieldTemplate
-                    .Replace("$CSTYPE_IMPL$", $"ProtobufRepeatedFieldValueType<{csType}>")
-                    .Replace("$CSTYPE$", $"IProtobufRepeatedFieldValueType<{csType}>")
-                    .Replace("$CSNAME$", csName)
-                    .Replace("$NAME$", fieldName);
-
-                var interfaceContent = InterfaceReadonlyFieldTemplate
-                    .Replace("$CSTYPE$", $"IProtobufRepeatedFieldValueType<{csType}>")
-                    .Replace("$CSNAME$", csName);
-
+                var csTypeImpl = $"ProtobufRepeatedFieldValueType<{csType}>";
+                var csTypeInterface = $"IProtobufRepeatedFieldValueType<{csType}>";
+                var content = $"public {csTypeInterface} {csName}\n{{ get => new {csTypeImpl}(Accessor, \"{fieldName}\"); }}";
+                var interfaceContent = $"public {csTypeInterface} {csName} {{ get; }}";
                 return (content, interfaceContent);
             }
 
-            var fieldContent = FieldTemplate
-                .Replace("$TYPE$", accessorType)
-                .Replace("$CSTYPE$", csType)
-                .Replace("$CSNAME$", csName)
-                .Replace("$NAME$", fieldName);
-
-            var fieldInterfaceContent = InterfaceFieldTemplate
-                .Replace("$CSTYPE$", csType)
-                .Replace("$CSNAME$", csName);
-
+            var fieldContent = $"public {csType} {csName}\n{{ get => Accessor.Get{accessorType}(\"{fieldName}\"); set => Accessor.Set{accessorType}(\"{fieldName}\", value); }}";
+            var fieldInterfaceContent = $"public {csType} {csName} {{ get; set; }}";
             return (fieldContent, fieldInterfaceContent);
         }
 
@@ -479,57 +478,30 @@ $FIELDS$
         {
             if (isRepeated)
             {
-                var content = RepeatedFieldTemplate
-                    .Replace("$CSTYPE_IMPL$", $"ProtobufRepeatedFieldValueType<{managedType}>")
-                    .Replace("$CSTYPE$", $"IProtobufRepeatedFieldValueType<{managedType}>")
-                    .Replace("$CSNAME$", csName)
-                    .Replace("$NAME$", fieldName);
-
-                var interfaceContent = InterfaceReadonlyFieldTemplate
-                    .Replace("$CSTYPE$", $"IProtobufRepeatedFieldValueType<{managedType}>")
-                    .Replace("$CSNAME$", csName);
-
+                var csTypeImpl = $"ProtobufRepeatedFieldValueType<{managedType}>";
+                var csTypeInterface = $"IProtobufRepeatedFieldValueType<{managedType}>";
+                var content = $"public {csTypeInterface} {csName}\n{{ get => new {csTypeImpl}(Accessor, \"{fieldName}\"); }}";
+                var interfaceContent = $"public {csTypeInterface} {csName} {{ get; }}";
                 return (content, interfaceContent);
             }
 
-            var fieldContent = FieldTemplate
-                .Replace("$TYPE$", managedType)
-                .Replace("$CSTYPE$", managedType)
-                .Replace("$CSNAME$", csName)
-                .Replace("$NAME$", fieldName);
-
-            var fieldInterfaceContent = InterfaceFieldTemplate
-                .Replace("$CSTYPE$", managedType)
-                .Replace("$CSNAME$", csName);
-
+            var fieldContent = $"public {managedType} {csName}\n{{ get => Accessor.Get{managedType}(\"{fieldName}\"); set => Accessor.Set{managedType}(\"{fieldName}\", value); }}";
+            var fieldInterfaceContent = $"public {managedType} {csName} {{ get; set; }}";
             return (fieldContent, fieldInterfaceContent);
         }
 
         // It's a nested message
         if (isRepeated)
         {
-            var content = RepeatedFieldTemplate
-                .Replace("$CSTYPE_IMPL$", $"ProtobufRepeatedFieldSubMessageType<{fieldType}>")
-                .Replace("$CSTYPE$", $"IProtobufRepeatedFieldSubMessageType<{fieldType}>")
-                .Replace("$CSNAME$", csName)
-                .Replace("$NAME$", fieldName);
-
-            var interfaceContent = InterfaceReadonlyFieldTemplate
-                .Replace("$CSTYPE$", $"IProtobufRepeatedFieldSubMessageType<{fieldType}>")
-                .Replace("$CSNAME$", csName);
-
+            var csTypeImpl = $"ProtobufRepeatedFieldSubMessageType<{fieldType}>";
+            var csTypeInterface = $"IProtobufRepeatedFieldSubMessageType<{fieldType}>";
+            var content = $"public {csTypeInterface} {csName}\n{{ get => new {csTypeImpl}(Accessor, \"{fieldName}\"); }}";
+            var interfaceContent = $"public {csTypeInterface} {csName} {{ get; }}";
             return (content, interfaceContent);
         }
 
-        var nestedContent = NestedFieldTemplate
-            .Replace("$TYPE$", fieldType)
-            .Replace("$CSNAME$", csName)
-            .Replace("$NAME$", fieldName);
-
-        var nestedInterfaceContent = InterfaceReadonlyFieldTemplate
-            .Replace("$CSTYPE$", fieldType)
-            .Replace("$CSNAME$", csName);
-
+        var nestedContent = $"public {fieldType} {csName}\n{{ get => new {fieldType}Impl(NativeNetMessages.GetNestedMessage(Address, \"{fieldName}\"), false); }}";
+        var nestedInterfaceContent = $"public {fieldType} {csName} {{ get; }}";
         return (nestedContent, nestedInterfaceContent);
     }
 
