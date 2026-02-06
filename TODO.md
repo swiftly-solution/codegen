@@ -1,0 +1,3 @@
+- [ ] Schema Generator (including ClassConvertor -> https://github.com/swiftly-solution/swiftlys2/pull/226/changes#diff-ffdba00de7e279a6ba3b31c700c73b8248be5f05164efd1cd5a01b7eb29f4797)
+- [ ] Docs Generator
+- [ ] SteamWorks Generator
