@@ -236,49 +236,59 @@ public class Natives : BaseGenerator
 
         var stringParams = nativeParams.Where(p => p.type == "string").Select(p => p.name).ToList();
         var bytesParams = nativeParams.Where(p => p.type == "bytes").Select(p => p.name).ToList();
-        var poolDeclared = false;
 
-        // string params
-        foreach (var paramName in stringParams)
-        {
-            if (!poolDeclared)
-            {
-                writer.AddLine("var pool = ArrayPool<byte>.Shared;");
-                poolDeclared = true;
-            }
-            writer.AddLine($"var {paramName}Length = Encoding.UTF8.GetByteCount({paramName});");
-            writer.AddLine($"var {paramName}Buffer = pool.Rent({paramName}Length + 1);");
-            writer.AddLine($"Encoding.UTF8.GetBytes({paramName}, {paramName}Buffer);");
-            writer.AddLine($"{paramName}Buffer[{paramName}Length] = 0;");
-        }
-
-        // bytes params
         foreach (var paramName in bytesParams)
         {
             writer.AddLine($"var {paramName}Length = {paramName}.Length;");
         }
 
-        // fixed blocks
-        var fixedBlocks = new List<string>();
-        foreach (var paramName in stringParams)
+        if (stringParams.Count > 0)
         {
-            fixedBlocks.Add($"fixed (byte* {paramName}BufferPtr = {paramName}Buffer)");
+            WriteStringAllocCalls(writer, returnType, functionName, nativeParams, stringParams, bytesParams, 0);
         }
-        foreach (var paramName in bytesParams)
+        else if (bytesParams.Count > 0)
         {
-            fixedBlocks.Add($"fixed (byte* {paramName}BufferPtr = {paramName})");
-        }
-
-        if (fixedBlocks.Count > 0)
-        {
+            var fixedBlocks = bytesParams.Select(p => $"fixed (byte* {p}BufferPtr = {p})").ToList();
             WriteWithFixedBlocks(writer, fixedBlocks, 0, () =>
             {
-                WriteNativeCall(writer, returnType, functionName, nativeParams, stringParams, bytesParams, ref poolDeclared);
+                WriteNativeCall(writer, returnType, functionName, nativeParams);
             });
         }
         else
         {
-            WriteNativeCall(writer, returnType, functionName, nativeParams, stringParams, bytesParams, ref poolDeclared);
+            WriteNativeCall(writer, returnType, functionName, nativeParams);
+        }
+    }
+
+    private void WriteStringAllocCalls(CodeWriter writer, string returnType, string functionName,
+        List<(string type, string name)> nativeParams, List<string> stringParams, List<string> bytesParams, int index)
+    {
+        if (index < stringParams.Count)
+        {
+            var paramName = stringParams[index];
+            var returnPrefix = returnType != "void" ? "return " : "";
+
+            writer.AddLine($"{returnPrefix}StringAlloc.CreateCString({paramName}, {paramName}BufferPtr =>");
+            writer.AddLine("{");
+            writer.Indent();
+            WriteStringAllocCalls(writer, returnType, functionName, nativeParams, stringParams, bytesParams, index + 1);
+            writer.Dedent();
+            writer.AddLine("});");
+        }
+        else
+        {
+            if (bytesParams.Count > 0)
+            {
+                var fixedBlocks = bytesParams.Select(p => $"fixed (byte* {p}BufferPtr = {p})").ToList();
+                WriteWithFixedBlocks(writer, fixedBlocks, 0, () =>
+                {
+                    WriteNativeCall(writer, returnType, functionName, nativeParams);
+                });
+            }
+            else
+            {
+                WriteNativeCall(writer, returnType, functionName, nativeParams);
+            }
         }
     }
 
@@ -298,50 +308,42 @@ public class Natives : BaseGenerator
     }
 
     private void WriteNativeCall(CodeWriter writer, string returnType, string functionName,
-        List<(string type, string name)> nativeParams, List<string> stringParams, List<string> bytesParams, ref bool poolDeclared)
+        List<(string type, string name)> nativeParams)
     {
         if (IsBufferReturn(returnType))
         {
-            // First call to get buffer size
             var firstCallArgs = new List<string> { "null" };
             firstCallArgs.AddRange(BuildCallArgs(nativeParams));
             writer.AddLine($"var ret = _{functionName}({string.Join(", ", firstCallArgs)});");
 
-            if (!poolDeclared)
+            if (returnType == "string")
+            {
+                writer.AddLine("return StringAlloc.CreateCSharpString(ret, retBufferPtr =>");
+                writer.AddLine("{");
+                writer.Indent();
+                var secondCallArgs = new List<string> { "(byte*)retBufferPtr" };
+                secondCallArgs.AddRange(BuildCallArgs(nativeParams));
+                writer.AddLine($"_ = _{functionName}({string.Join(", ", secondCallArgs)});");
+                writer.Dedent();
+                writer.AddLine("});");
+            }
+            else
             {
                 writer.AddLine("var pool = ArrayPool<byte>.Shared;");
-                poolDeclared = true;
-            }
-            writer.AddLine("var retBuffer = pool.Rent(ret + 1);");
+                writer.AddLine("var retBuffer = pool.Rent(ret + 1);");
 
-            writer.AddBlock("fixed (byte* retBufferPtr = retBuffer)", () =>
-            {
-                var secondCallArgs = new List<string> { "retBufferPtr" };
-                secondCallArgs.AddRange(BuildCallArgs(nativeParams));
-                writer.AddLine($"ret = _{functionName}({string.Join(", ", secondCallArgs)});");
+                writer.AddBlock("fixed (byte* retBufferPtr = retBuffer)", () =>
+                {
+                    var secondCallArgs = new List<string> { "retBufferPtr" };
+                    secondCallArgs.AddRange(BuildCallArgs(nativeParams));
+                    writer.AddLine($"ret = _{functionName}({string.Join(", ", secondCallArgs)});");
 
-                if (returnType == "string")
-                {
-                    writer.AddLine("var retString = Encoding.UTF8.GetString(retBufferPtr, ret);");
-                    writer.AddLine("pool.Return(retBuffer);");
-                    foreach (var param in stringParams)
-                    {
-                        writer.AddLine($"pool.Return({param}Buffer);");
-                    }
-                    writer.AddLine("return retString;");
-                }
-                else // bytes
-                {
                     writer.AddLine("var retBytes = new byte[ret];");
                     writer.AddLine("for (int i = 0; i < ret; i++) retBytes[i] = retBufferPtr[i];");
                     writer.AddLine("pool.Return(retBuffer);");
-                    foreach (var param in stringParams)
-                    {
-                        writer.AddLine($"pool.Return({param}Buffer);");
-                    }
                     writer.AddLine("return retBytes;");
-                }
-            });
+                });
+            }
         }
         else
         {
@@ -354,11 +356,6 @@ public class Natives : BaseGenerator
             else
             {
                 writer.AddLine($"var ret = _{functionName}({string.Join(", ", callArgs)});");
-            }
-
-            foreach (var param in stringParams)
-            {
-                writer.AddLine($"pool.Return({param}Buffer);");
             }
 
             if (returnType != "void")
@@ -382,7 +379,7 @@ public class Natives : BaseGenerator
         {
             if (type == "string")
             {
-                args.Add($"{name}BufferPtr");
+                args.Add($"(byte*){name}BufferPtr");
             }
             else if (type == "bytes")
             {
