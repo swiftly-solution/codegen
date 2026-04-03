@@ -1,0 +1,1888 @@
+{
+    "entity_classes": [
+        {
+            "class_name": "CFuncNavObstruction",
+            "designer_name": "func_nav_avoidance_obstacle"
+        },
+        {
+            "class_name": "CScriptNavBlocker",
+            "designer_name": "script_nav_blocker"
+        },
+        {
+            "class_name": "CEconWearable",
+            "designer_name": "wearable_item"
+        },
+        {
+            "class_name": "CTriggerDetectExplosion",
+            "designer_name": "trigger_detect_explosion"
+        },
+        {
+            "class_name": "CTriggerDetectBulletFire",
+            "designer_name": "trigger_detect_bullet_fire"
+        },
+        {
+            "class_name": "CTriggerPhysics",
+            "designer_name": "trigger_physics"
+        },
+        {
+            "class_name": "CTriggerActiveWeaponDetect",
+            "designer_name": "trigger_active_weapon_detect"
+        },
+        {
+            "class_name": "CServerRagdollTrigger",
+            "designer_name": "trigger_serverragdoll"
+        },
+        {
+            "class_name": "CTriggerImpact",
+            "designer_name": "trigger_impact"
+        },
+        {
+            "class_name": "CLogicProximity",
+            "designer_name": "logic_proximity"
+        },
+        {
+            "class_name": "CTriggerProximity",
+            "designer_name": "trigger_proximity"
+        },
+        {
+            "class_name": "CAI_ChangeHintGroup",
+            "designer_name": "ai_changehintgroup"
+        },
+        {
+            "class_name": "CTriggerGravity",
+            "designer_name": "trigger_gravity"
+        },
+        {
+            "class_name": "CTriggerSave",
+            "designer_name": "trigger_autosave"
+        },
+        {
+            "class_name": "CTriggerToggleSave",
+            "designer_name": "trigger_togglesave"
+        },
+        {
+            "class_name": "CInfoTeleportDestination",
+            "designer_name": "info_teleport_destination"
+        },
+        {
+            "class_name": "CScriptTriggerPush",
+            "designer_name": "script_trigger_push"
+        },
+        {
+            "class_name": "CTriggerPush",
+            "designer_name": "trigger_push"
+        },
+        {
+            "class_name": "CTriggerVolume",
+            "designer_name": "trigger_transition"
+        },
+        {
+            "class_name": "CTriggerLook",
+            "designer_name": "trigger_look"
+        },
+        {
+            "class_name": "CScriptTriggerOnce",
+            "designer_name": "script_trigger_once"
+        },
+        {
+            "class_name": "CTriggerOnce",
+            "designer_name": "trigger_once"
+        },
+        {
+            "class_name": "CScriptTriggerMultiple",
+            "designer_name": "script_trigger_multiple"
+        },
+        {
+            "class_name": "CScriptTriggerHurt",
+            "designer_name": "script_trigger_hurt"
+        },
+        {
+            "class_name": "CTriggerRemove",
+            "designer_name": "trigger_remove"
+        },
+        {
+            "class_name": "CFuncTrackAuto",
+            "designer_name": "func_trackautochange"
+        },
+        {
+            "class_name": "CFuncTrackChange",
+            "designer_name": "func_trackchange"
+        },
+        {
+            "class_name": "CFuncTrainControls",
+            "designer_name": "func_traincontrols"
+        },
+        {
+            "class_name": "CFuncTrain",
+            "designer_name": "func_train"
+        },
+        {
+            "class_name": "CFuncPlatRot",
+            "designer_name": "func_platrot"
+        },
+        {
+            "class_name": "CPlatTrigger",
+            "designer_name": "plat_trigger"
+        },
+        {
+            "class_name": "CFuncPlat",
+            "designer_name": "func_plat"
+        },
+        {
+            "class_name": "CHandleDummy",
+            "designer_name": "handle_dummy"
+        },
+        {
+            "class_name": "CHandleTest",
+            "designer_name": "handle_test"
+        },
+        {
+            "class_name": "CTankTrainAI",
+            "designer_name": "tanktrain_ai"
+        },
+        {
+            "class_name": "CTankTargetChange",
+            "designer_name": "tanktrain_aitarget"
+        },
+        {
+            "class_name": "CFuncTankTrain",
+            "designer_name": "func_tanktrain"
+        },
+        {
+            "class_name": "CInfoLandmark",
+            "designer_name": "info_landmark"
+        },
+        {
+            "class_name": "CBaseDMStart",
+            "designer_name": "info_player_deathmatch"
+        },
+        {
+            "class_name": "CNullEntity",
+            "designer_name": "info_null"
+        },
+        {
+            "class_name": "CCitadelSoundOpvarSetOBB",
+            "designer_name": "citadel_snd_opvar_set_obb"
+        },
+        {
+            "class_name": "CSoundOpvarSetEntity",
+            "designer_name": "snd_opvar_set"
+        },
+        {
+            "class_name": "CScriptedSequence",
+            "designer_name": "scripted_sequence"
+        },
+        {
+            "class_name": "CSceneEntity",
+            "designer_name": "scripted_scene"
+        },
+        {
+            "class_name": "CSceneListManager",
+            "designer_name": "logic_scene_list_manager"
+        },
+        {
+            "class_name": "CInstancedSceneEntity",
+            "designer_name": "instanced_scripted_scene"
+        },
+        {
+            "class_name": "CRevertSaved",
+            "designer_name": "player_loadsaved"
+        },
+        {
+            "class_name": "CFuncPropRespawnZone",
+            "designer_name": "func_proprrespawnzone"
+        },
+        {
+            "class_name": "COrnamentProp",
+            "designer_name": "prop_dynamic_ornament"
+        },
+        {
+            "class_name": "CEnableMotionFixup",
+            "designer_name": "point_enable_motion_fixup"
+        },
+        {
+            "class_name": "CPropDoorRotatingBreakable",
+            "designer_name": "prop_door_rotating"
+        },
+        {
+            "class_name": "CPointTeleport",
+            "designer_name": "point_teleport"
+        },
+        {
+            "class_name": "CPointHurt",
+            "designer_name": "point_hurt"
+        },
+        {
+            "class_name": "CPointVelocitySensor",
+            "designer_name": "point_velocitysensor"
+        },
+        {
+            "class_name": "CPointAngularVelocitySensor",
+            "designer_name": "point_angularvelocitysensor"
+        },
+        {
+            "class_name": "CPointProximitySensor",
+            "designer_name": "point_proximity_sensor"
+        },
+        {
+            "class_name": "CPointAngleSensor",
+            "designer_name": "point_anglesensor"
+        },
+        {
+            "class_name": "CPointWorldText",
+            "designer_name": "point_worldtext"
+        },
+        {
+            "class_name": "CPointValueRemapper",
+            "designer_name": "point_value_remapper"
+        },
+        {
+            "class_name": "CPointPulse",
+            "designer_name": "point_pulse"
+        },
+        {
+            "class_name": "CPointEntityFinder",
+            "designer_name": "point_entity_finder"
+        },
+        {
+            "class_name": "CPointPush",
+            "designer_name": "point_push"
+        },
+        {
+            "class_name": "CPhysicsSpring",
+            "designer_name": "phys_spring"
+        },
+        {
+            "class_name": "CRagdollPropAttached",
+            "designer_name": "prop_ragdoll_attached"
+        },
+        {
+            "class_name": "CPhysicsEntitySolver",
+            "designer_name": "physics_entity_solver"
+        },
+        {
+            "class_name": "CPhysWheelConstraint",
+            "designer_name": "phys_wheelconstraint"
+        },
+        {
+            "class_name": "CSplineConstraint",
+            "designer_name": "phys_splineconstraint"
+        },
+        {
+            "class_name": "CGenericConstraint",
+            "designer_name": "phys_genericconstraint"
+        },
+        {
+            "class_name": "CRagdollConstraint",
+            "designer_name": "phys_ragdollconstraint"
+        },
+        {
+            "class_name": "CPhysLength",
+            "designer_name": "phys_lengthconstraint"
+        },
+        {
+            "class_name": "CPhysPulley",
+            "designer_name": "phys_pulleyconstraint"
+        },
+        {
+            "class_name": "CPhysFixed",
+            "designer_name": "phys_constraint"
+        },
+        {
+            "class_name": "CPhysSlideConstraint",
+            "designer_name": "phys_slideconstraint"
+        },
+        {
+            "class_name": "CPhysBallSocket",
+            "designer_name": "phys_ballsocket"
+        },
+        {
+            "class_name": "CPhysHinge",
+            "designer_name": "phys_hinge"
+        },
+        {
+            "class_name": "CConstraintAnchor",
+            "designer_name": "info_constraint_anchor"
+        },
+        {
+            "class_name": "CKeepUpright",
+            "designer_name": "phys_keepupright"
+        },
+        {
+            "class_name": "CPhysTorque",
+            "designer_name": "phys_torque"
+        },
+        {
+            "class_name": "CPhysThruster",
+            "designer_name": "phys_thruster"
+        },
+        {
+            "class_name": "CPathCorner",
+            "designer_name": "path_corner"
+        },
+        {
+            "class_name": "CPathCornerCrash",
+            "designer_name": "path_corner_crash"
+        },
+        {
+            "class_name": "CBaseMoveBehavior",
+            "designer_name": "move_keyframed"
+        },
+        {
+            "class_name": "CPathKeyFrame",
+            "designer_name": "keyframe_track"
+        },
+        {
+            "class_name": "CTriggerBrush",
+            "designer_name": "trigger_brush"
+        },
+        {
+            "class_name": "CFuncElectrifiedVolume",
+            "designer_name": "func_electrified_volume"
+        },
+        {
+            "class_name": "CMessageEntity",
+            "designer_name": "point_message"
+        },
+        {
+            "class_name": "CMarkupVolumeTagged_NavGame",
+            "designer_name": "func_nav_markup_game"
+        },
+        {
+            "class_name": "CMarkupVolumeTagged_Nav",
+            "designer_name": "func_nav_markup"
+        },
+        {
+            "class_name": "CSimpleMarkupVolumeTagged",
+            "designer_name": "markup_volume_tagged"
+        },
+        {
+            "class_name": "CGamePlayerZone",
+            "designer_name": "game_zone_player"
+        },
+        {
+            "class_name": "CGameText",
+            "designer_name": "game_text"
+        },
+        {
+            "class_name": "CGameEnd",
+            "designer_name": "game_end"
+        },
+        {
+            "class_name": "CLogicGameEvent",
+            "designer_name": "logic_game_event"
+        },
+        {
+            "class_name": "CLogicBranchList",
+            "designer_name": "logic_branch_listener"
+        },
+        {
+            "class_name": "CLogicCollisionPair",
+            "designer_name": "logic_collision_pair"
+        },
+        {
+            "class_name": "CLogicDistanceAutosave",
+            "designer_name": "logic_distance_autosave"
+        },
+        {
+            "class_name": "CLogicActiveAutosave",
+            "designer_name": "logic_active_autosave"
+        },
+        {
+            "class_name": "CLogicAutosave",
+            "designer_name": "logic_autosave"
+        },
+        {
+            "class_name": "CLogicCompare",
+            "designer_name": "logic_compare"
+        },
+        {
+            "class_name": "CLogicCase",
+            "designer_name": "logic_case"
+        },
+        {
+            "class_name": "CMathCounter",
+            "designer_name": "math_counter"
+        },
+        {
+            "class_name": "CMultiSource",
+            "designer_name": "multisource"
+        },
+        {
+            "class_name": "CEnvGlobal",
+            "designer_name": "env_global"
+        },
+        {
+            "class_name": "CMathColorBlend",
+            "designer_name": "math_colorblend"
+        },
+        {
+            "class_name": "CMathRemap",
+            "designer_name": "math_remap"
+        },
+        {
+            "class_name": "CLogicLineToEntity",
+            "designer_name": "logic_lineto"
+        },
+        {
+            "class_name": "CTimerEntity",
+            "designer_name": "logic_timer"
+        },
+        {
+            "class_name": "CLogicScript",
+            "designer_name": "logic_script"
+        },
+        {
+            "class_name": "CLogicAuto",
+            "designer_name": "logic_auto"
+        },
+        {
+            "class_name": "CLogicPlayerProxy",
+            "designer_name": "logic_playerproxy"
+        },
+        {
+            "class_name": "CLogicNPCCounterOBB",
+            "designer_name": "logic_npc_counter_obb"
+        },
+        {
+            "class_name": "CLogicNPCCounterAABB",
+            "designer_name": "logic_npc_counter_aabb"
+        },
+        {
+            "class_name": "CLogicNPCCounter",
+            "designer_name": "logic_npc_counter_radius"
+        },
+        {
+            "class_name": "CLogicNavigation",
+            "designer_name": "logic_navigation"
+        },
+        {
+            "class_name": "CLogicMeasureMovement",
+            "designer_name": "logic_measure_movement"
+        },
+        {
+            "class_name": "CTriggerGameEvent",
+            "designer_name": "trigger_game_event"
+        },
+        {
+            "class_name": "CLogicGameEventListener",
+            "designer_name": "logic_gameevent_listener"
+        },
+        {
+            "class_name": "CLogicAchievement",
+            "designer_name": "logic_achievement"
+        },
+        {
+            "class_name": "CScriptItem",
+            "designer_name": "scripted_item_drop"
+        },
+        {
+            "class_name": "CInfoSpawnGroupLoadUnload",
+            "designer_name": "info_spawngroup_load_unload"
+        },
+        {
+            "class_name": "CInfoSpawnGroupLandmark",
+            "designer_name": "info_spawngroup_landmark"
+        },
+        {
+            "class_name": "CInfoPlayerStart",
+            "designer_name": "info_player_start"
+        },
+        {
+            "class_name": "CInfoChoreoAnchor",
+            "designer_name": "info_choreo_anchor"
+        },
+        {
+            "class_name": "CGunTarget",
+            "designer_name": "func_guntarget"
+        },
+        {
+            "class_name": "CFuncTimescale",
+            "designer_name": "func_timescale"
+        },
+        {
+            "class_name": "CFuncMonitor",
+            "designer_name": "func_monitor"
+        },
+        {
+            "class_name": "CPushable",
+            "designer_name": "func_pushable"
+        },
+        {
+            "class_name": "CEnvExplosion",
+            "designer_name": "env_explosion"
+        },
+        {
+            "class_name": "CShower",
+            "designer_name": "spark_shower"
+        },
+        {
+            "class_name": "CEnvSpark",
+            "designer_name": "env_spark"
+        },
+        {
+            "class_name": "CEnvTilt",
+            "designer_name": "env_tilt"
+        },
+        {
+            "class_name": "CEnvShake",
+            "designer_name": "env_shake"
+        },
+        {
+            "class_name": "CCredits",
+            "designer_name": "env_credits"
+        },
+        {
+            "class_name": "CEnvFade",
+            "designer_name": "env_fade"
+        },
+        {
+            "class_name": "CEnvBeam",
+            "designer_name": "env_beam"
+        },
+        {
+            "class_name": "CInstructorEventEntity",
+            "designer_name": "point_instructor_event"
+        },
+        {
+            "class_name": "CEnvInstructorVRHint",
+            "designer_name": "env_instructor_vr_hint"
+        },
+        {
+            "class_name": "CEnvInstructorHint",
+            "designer_name": "env_instructor_hint"
+        },
+        {
+            "class_name": "CInfoInstructorHintTarget",
+            "designer_name": "info_target_instructor_hint"
+        },
+        {
+            "class_name": "CEnvEntityMaker",
+            "designer_name": "env_entity_maker"
+        },
+        {
+            "class_name": "CDebugHistory",
+            "designer_name": "env_debughistory"
+        },
+        {
+            "class_name": "CEnvEntityIgniter",
+            "designer_name": "env_entity_igniter"
+        },
+        {
+            "class_name": "CEnvViewPunch",
+            "designer_name": "env_viewpunch"
+        },
+        {
+            "class_name": "CEnvSplash",
+            "designer_name": "env_splash"
+        },
+        {
+            "class_name": "CEnvMuzzleFlash",
+            "designer_name": "env_muzzleflash"
+        },
+        {
+            "class_name": "CPhysicsWire",
+            "designer_name": "env_physwire"
+        },
+        {
+            "class_name": "CEnvWind",
+            "designer_name": "env_wind"
+        },
+        {
+            "class_name": "CPrecipitationBlocker",
+            "designer_name": "func_precipitation_blocker"
+        },
+        {
+            "class_name": "CPrecipitation",
+            "designer_name": "func_precipitation"
+        },
+        {
+            "class_name": "CItemSoda",
+            "designer_name": "item_sodacan"
+        },
+        {
+            "class_name": "CEnvBeverage",
+            "designer_name": "env_beverage"
+        },
+        {
+            "class_name": "CBlood",
+            "designer_name": "env_blood"
+        },
+        {
+            "class_name": "CTestEffect",
+            "designer_name": "test_effect"
+        },
+        {
+            "class_name": "CDynamicLight",
+            "designer_name": "light_dynamic"
+        },
+        {
+            "class_name": "CRotDoor",
+            "designer_name": "func_door_rotating"
+        },
+        {
+            "class_name": "CCommentaryAuto",
+            "designer_name": "commentary_auto"
+        },
+        {
+            "class_name": "CCommentaryViewPosition",
+            "designer_name": "point_commentary_viewpoint"
+        },
+        {
+            "class_name": "CPointCommentaryNode",
+            "designer_name": "point_commentary_node"
+        },
+        {
+            "class_name": "CColorCorrectionVolume",
+            "designer_name": "color_correction_volume"
+        },
+        {
+            "class_name": "CPointBroadcastClientCommand",
+            "designer_name": "point_broadcastclientcommand"
+        },
+        {
+            "class_name": "CPointServerCommand",
+            "designer_name": "point_servercommand"
+        },
+        {
+            "class_name": "CPointClientCommand",
+            "designer_name": "point_clientcommand"
+        },
+        {
+            "class_name": "CFuncInteractionLayerClip",
+            "designer_name": "func_clip_interaction_layer"
+        },
+        {
+            "class_name": "CFuncVPhysicsClip",
+            "designer_name": "func_clip_vphysics"
+        },
+        {
+            "class_name": "CFuncIllusionary",
+            "designer_name": "func_illusionary"
+        },
+        {
+            "class_name": "CFuncVehicleClip",
+            "designer_name": "func_vehicleclip"
+        },
+        {
+            "class_name": "CFuncWallToggle",
+            "designer_name": "func_wall_toggle"
+        },
+        {
+            "class_name": "CFuncWall",
+            "designer_name": "func_wall"
+        },
+        {
+            "class_name": "CInfoGameEventProxy",
+            "designer_name": "info_game_event_proxy"
+        },
+        {
+            "class_name": "CWorld",
+            "designer_name": "worldent"
+        },
+        {
+            "class_name": "CTextureBasedAnimatable",
+            "designer_name": "hl_vr_texture_based_animatable"
+        },
+        {
+            "class_name": "CParticleSystem",
+            "designer_name": "info_particle_system"
+        },
+        {
+            "class_name": "CEnvParticleGlow",
+            "designer_name": "env_particle_glow"
+        },
+        {
+            "class_name": "CInfoInteraction",
+            "designer_name": "info_interaction"
+        },
+        {
+            "class_name": "CPointGamestatsCounter",
+            "designer_name": "point_gamestats_counter"
+        },
+        {
+            "class_name": "CFilterClass",
+            "designer_name": "filter_activator_class"
+        },
+        {
+            "class_name": "CFilterLOS",
+            "designer_name": "filter_los"
+        },
+        {
+            "class_name": "CFilterProximity",
+            "designer_name": "filter_proximity"
+        },
+        {
+            "class_name": "CFilterMultiple",
+            "designer_name": "filter_multi"
+        },
+        {
+            "class_name": "CBaseFilter",
+            "designer_name": "filter_base"
+        },
+        {
+            "class_name": "CFilterAttributeInt",
+            "designer_name": "filter_activator_attribute_int"
+        },
+        {
+            "class_name": "CFilterEnemy",
+            "designer_name": "filter_enemy"
+        },
+        {
+            "class_name": "FilterHealth",
+            "designer_name": "filter_health"
+        },
+        {
+            "class_name": "FilterDamageType",
+            "designer_name": "filter_damage_type"
+        },
+        {
+            "class_name": "CFilterMassGreater",
+            "designer_name": "filter_activator_mass_greater"
+        },
+        {
+            "class_name": "CFilterTeam",
+            "designer_name": "filter_activator_team"
+        },
+        {
+            "class_name": "CFilterContext",
+            "designer_name": "filter_activator_context"
+        },
+        {
+            "class_name": "CFilterModel",
+            "designer_name": "filter_activator_model"
+        },
+        {
+            "class_name": "CFilterName",
+            "designer_name": "filter_activator_name"
+        },
+        {
+            "class_name": "CBasePlayerController",
+            "designer_name": "player_controller"
+        },
+        {
+            "class_name": "CCSPlayerResource",
+            "designer_name": "cs_player_manager"
+        },
+        {
+            "class_name": "CPlayerPing",
+            "designer_name": "info_player_ping"
+        },
+        {
+            "class_name": "CFootstepControl",
+            "designer_name": "func_footstep_control"
+        },
+        {
+            "class_name": "CCSPlayerController",
+            "designer_name": "cs_player_controller"
+        },
+        {
+            "class_name": "CWeaponTaser",
+            "designer_name": "weapon_taser"
+        },
+        {
+            "class_name": "CSmokeGrenade",
+            "designer_name": "weapon_smokegrenade"
+        },
+        {
+            "class_name": "CIncendiaryGrenade",
+            "designer_name": "weapon_incgrenade"
+        },
+        {
+            "class_name": "CMolotovGrenade",
+            "designer_name": "weapon_molotov"
+        },
+        {
+            "class_name": "CKnife",
+            "designer_name": "weapon_knife"
+        },
+        {
+            "class_name": "CHEGrenade",
+            "designer_name": "weapon_hegrenade"
+        },
+        {
+            "class_name": "CFlashbang",
+            "designer_name": "weapon_flashbang"
+        },
+        {
+            "class_name": "CWeaponElite",
+            "designer_name": "weapon_elite"
+        },
+        {
+            "class_name": "CDecoyGrenade",
+            "designer_name": "weapon_decoy"
+        },
+        {
+            "class_name": "CDEagle",
+            "designer_name": "weapon_deagle"
+        },
+        {
+            "class_name": "CWeaponCZ75a",
+            "designer_name": "weapon_cz75a"
+        },
+        {
+            "class_name": "CWeaponXM1014",
+            "designer_name": "weapon_xm1014"
+        },
+        {
+            "class_name": "CWeaponSawedoff",
+            "designer_name": "weapon_sawedoff"
+        },
+        {
+            "class_name": "CWeaponNOVA",
+            "designer_name": "weapon_nova"
+        },
+        {
+            "class_name": "CWeaponRevolver",
+            "designer_name": "weapon_revolver"
+        },
+        {
+            "class_name": "CWeaponM249",
+            "designer_name": "weapon_m249"
+        },
+        {
+            "class_name": "CWeaponUMP45",
+            "designer_name": "weapon_ump45"
+        },
+        {
+            "class_name": "CWeaponTec9",
+            "designer_name": "weapon_tec9"
+        },
+        {
+            "class_name": "CWeaponSSG08",
+            "designer_name": "weapon_ssg08"
+        },
+        {
+            "class_name": "CWeaponSG556",
+            "designer_name": "weapon_sg556"
+        },
+        {
+            "class_name": "CWeaponSCAR20",
+            "designer_name": "weapon_scar20"
+        },
+        {
+            "class_name": "CWeaponP90",
+            "designer_name": "weapon_p90"
+        },
+        {
+            "class_name": "CWeaponP250",
+            "designer_name": "weapon_p250"
+        },
+        {
+            "class_name": "CWeaponNegev",
+            "designer_name": "weapon_negev"
+        },
+        {
+            "class_name": "CWeaponMP9",
+            "designer_name": "weapon_mp9"
+        },
+        {
+            "class_name": "CWeaponMP7",
+            "designer_name": "weapon_mp7"
+        },
+        {
+            "class_name": "CWeaponMP5SD",
+            "designer_name": "weapon_mp5sd"
+        },
+        {
+            "class_name": "CWeaponMag7",
+            "designer_name": "weapon_mag7"
+        },
+        {
+            "class_name": "CWeaponMAC10",
+            "designer_name": "weapon_mac10"
+        },
+        {
+            "class_name": "CWeaponM4A1Silencer",
+            "designer_name": "weapon_m4a1_silencer"
+        },
+        {
+            "class_name": "CWeaponM4A1",
+            "designer_name": "weapon_m4a1"
+        },
+        {
+            "class_name": "CWeaponUSPSilencer",
+            "designer_name": "weapon_usp_silencer"
+        },
+        {
+            "class_name": "CWeaponHKP2000",
+            "designer_name": "weapon_hkp2000"
+        },
+        {
+            "class_name": "CWeaponGlock",
+            "designer_name": "weapon_glock"
+        },
+        {
+            "class_name": "CWeaponGalilAR",
+            "designer_name": "weapon_galilar"
+        },
+        {
+            "class_name": "CWeaponG3SG1",
+            "designer_name": "weapon_g3sg1"
+        },
+        {
+            "class_name": "CWeaponFiveSeven",
+            "designer_name": "weapon_fiveseven"
+        },
+        {
+            "class_name": "CWeaponFamas",
+            "designer_name": "weapon_famas"
+        },
+        {
+            "class_name": "CWeaponBizon",
+            "designer_name": "weapon_bizon"
+        },
+        {
+            "class_name": "CWeaponAWP",
+            "designer_name": "weapon_awp"
+        },
+        {
+            "class_name": "CWeaponAug",
+            "designer_name": "weapon_aug"
+        },
+        {
+            "class_name": "CAK47",
+            "designer_name": "weapon_ak47"
+        },
+        {
+            "class_name": "CCSWeaponBase",
+            "designer_name": "weapon_cs_base"
+        },
+        {
+            "class_name": "CC4",
+            "designer_name": "weapon_c4"
+        },
+        {
+            "class_name": "CPlantedC4",
+            "designer_name": "planted_c4"
+        },
+        {
+            "class_name": "CWeaponBaseItem",
+            "designer_name": "weapon_csbase"
+        },
+        {
+            "class_name": "CBaseCSGrenade",
+            "designer_name": "weapon_basecsgrenade"
+        },
+        {
+            "class_name": "CSmokeGrenadeProjectile",
+            "designer_name": "smokegrenade_projectile"
+        },
+        {
+            "class_name": "CMolotovProjectile",
+            "designer_name": "molotov_projectile"
+        },
+        {
+            "class_name": "CItem_Healthshot",
+            "designer_name": "weapon_healthshot"
+        },
+        {
+            "class_name": "CDecoyProjectile",
+            "designer_name": "decoy_projectile"
+        },
+        {
+            "class_name": "CCSSprite",
+            "designer_name": "env_sprite_clientside"
+        },
+        {
+            "class_name": "CPhysicsPropMultiplayer",
+            "designer_name": "prop_physics_multiplayer"
+        },
+        {
+            "class_name": "CFuncWater",
+            "designer_name": "func_water"
+        },
+        {
+            "class_name": "CTriggerBuoyancy",
+            "designer_name": "trigger_buoyancy"
+        },
+        {
+            "class_name": "CInfoInstructorHintHostageRescueZone",
+            "designer_name": "info_hostage_rescue_zone_hint"
+        },
+        {
+            "class_name": "CHostageRescueZone",
+            "designer_name": "func_hostage_rescue"
+        },
+        {
+            "class_name": "CInfoInstructorHintBombTargetB",
+            "designer_name": "info_bomb_target_hint_B"
+        },
+        {
+            "class_name": "CInfoInstructorHintBombTargetA",
+            "designer_name": "info_bomb_target_hint_A"
+        },
+        {
+            "class_name": "CBombTarget",
+            "designer_name": "func_bomb_target"
+        },
+        {
+            "class_name": "CCSGO_EndOfMatchLineupEnd",
+            "designer_name": "end_of_match_lineup_end"
+        },
+        {
+            "class_name": "CCSGO_EndOfMatchLineupStart",
+            "designer_name": "end_of_match_lineup_start"
+        },
+        {
+            "class_name": "CCSGO_WingmanIntroCounterTerroristPosition",
+            "designer_name": "wingman_intro_counterterrorist"
+        },
+        {
+            "class_name": "CCSGO_WingmanIntroTerroristPosition",
+            "designer_name": "wingman_intro_terrorist"
+        },
+        {
+            "class_name": "CCSGO_TeamIntroCounterTerroristPosition",
+            "designer_name": "team_intro_counterterrorist"
+        },
+        {
+            "class_name": "CCSGO_TeamIntroTerroristPosition",
+            "designer_name": "team_intro_terrorist"
+        },
+        {
+            "class_name": "CCSGO_TeamSelectCounterTerroristPosition",
+            "designer_name": "team_select_counterterrorist"
+        },
+        {
+            "class_name": "CCSGO_TeamSelectTerroristPosition",
+            "designer_name": "team_select_terrorist"
+        },
+        {
+            "class_name": "CCSPetPlacement",
+            "designer_name": "cs_pet_placement"
+        },
+        {
+            "class_name": "CCSMinimapBoundary",
+            "designer_name": "cs_minimap_boundary"
+        },
+        {
+            "class_name": "CFuncRetakeBarrier",
+            "designer_name": "func_retakebarrier"
+        },
+        {
+            "class_name": "CCSGameRulesProxy",
+            "designer_name": "cs_gamerules"
+        },
+        {
+            "class_name": "SpawnPoint",
+            "designer_name": "spawnpoint"
+        },
+        {
+            "class_name": "CPointGiveAmmo",
+            "designer_name": "point_give_ammo"
+        },
+        {
+            "class_name": "CInfoDeathmatchSpawn",
+            "designer_name": "info_deathmatch_spawn"
+        },
+        {
+            "class_name": "CInfoPlayerCounterterrorist",
+            "designer_name": "info_player_counterterrorist"
+        },
+        {
+            "class_name": "CInfoPlayerTerrorist",
+            "designer_name": "info_player_terrorist"
+        },
+        {
+            "class_name": "CBaseGrenade",
+            "designer_name": "grenade"
+        },
+        {
+            "class_name": "CCashStack",
+            "designer_name": "cash_stack"
+        },
+        {
+            "class_name": "CPulseGameBlackboard",
+            "designer_name": "pulse_game_blackboard"
+        },
+        {
+            "class_name": "CFogVolume",
+            "designer_name": "fog_volume"
+        },
+        {
+            "class_name": "CNavSpaceInfo",
+            "designer_name": "info_nav_space"
+        },
+        {
+            "class_name": "CFuncNavBlocker",
+            "designer_name": "func_nav_blocker"
+        },
+        {
+            "class_name": "CNavWalkable",
+            "designer_name": "point_nav_walkable"
+        },
+        {
+            "class_name": "CWaterBullet",
+            "designer_name": "waterbullet"
+        },
+        {
+            "class_name": "CTriggerTeleport",
+            "designer_name": "trigger_teleport"
+        },
+        {
+            "class_name": "CChangeLevel",
+            "designer_name": "trigger_changelevel"
+        },
+        {
+            "class_name": "CTriggerLerpObject",
+            "designer_name": "trigger_lerp_object"
+        },
+        {
+            "class_name": "CTriggerCallback",
+            "designer_name": "trigger_callback"
+        },
+        {
+            "class_name": "CTriggerHurt",
+            "designer_name": "trigger_hurt"
+        },
+        {
+            "class_name": "CTriggerSndSosOpvar",
+            "designer_name": "trigger_snd_sos_opvar"
+        },
+        {
+            "class_name": "CTriggerMultiple",
+            "designer_name": "trigger_multiple"
+        },
+        {
+            "class_name": "CFuncTrackTrain",
+            "designer_name": "func_tracktrain"
+        },
+        {
+            "class_name": "CSpotlightEnd",
+            "designer_name": "spotlight_end"
+        },
+        {
+            "class_name": "CEnvSoundscapeTriggerable",
+            "designer_name": "env_soundscape_triggerable"
+        },
+        {
+            "class_name": "CEnvSoundscapeProxy",
+            "designer_name": "env_soundscape_proxy"
+        },
+        {
+            "class_name": "CSkyCamera",
+            "designer_name": "sky_camera"
+        },
+        {
+            "class_name": "CSkyboxReference",
+            "designer_name": "skybox_reference"
+        },
+        {
+            "class_name": "CRopeKeyframe",
+            "designer_name": "keyframe_rope"
+        },
+        {
+            "class_name": "CPointPrefab",
+            "designer_name": "point_prefab"
+        },
+        {
+            "class_name": "CPhysMagnet",
+            "designer_name": "phys_magnet"
+        },
+        {
+            "class_name": "CPhysImpact",
+            "designer_name": "env_physimpact"
+        },
+        {
+            "class_name": "CPhysExplosion",
+            "designer_name": "env_physexplosion"
+        },
+        {
+            "class_name": "CPhysBox",
+            "designer_name": "func_physbox"
+        },
+        {
+            "class_name": "CPhysicsPropRespawnable",
+            "designer_name": "prop_physics_respawnable"
+        },
+        {
+            "class_name": "CPhysicsPropOverride",
+            "designer_name": "prop_physics_override"
+        },
+        {
+            "class_name": "CPhysicsProp",
+            "designer_name": "prop_physics"
+        },
+        {
+            "class_name": "CRagdollProp",
+            "designer_name": "prop_ragdoll"
+        },
+        {
+            "class_name": "CPhysMotor",
+            "designer_name": "phys_motor"
+        },
+        {
+            "class_name": "CPathTrack",
+            "designer_name": "path_track"
+        },
+        {
+            "class_name": "CPathWithDynamicNodes",
+            "designer_name": "path_with_dynamic_nodes"
+        },
+        {
+            "class_name": "CPathNode",
+            "designer_name": "path_node"
+        },
+        {
+            "class_name": "CPathSimple",
+            "designer_name": "path_simple"
+        },
+        {
+            "class_name": "CPathParticleRope",
+            "designer_name": "path_particle_rope"
+        },
+        {
+            "class_name": "CDynamicNavConnectionsVolume",
+            "designer_name": "func_nav_dynamic_connections"
+        },
+        {
+            "class_name": "CFuncBrush",
+            "designer_name": "func_brush"
+        },
+        {
+            "class_name": "CMarkupVolumeWithRef",
+            "designer_name": "markup_volume_with_ref"
+        },
+        {
+            "class_name": "CMarkupVolume",
+            "designer_name": "markup_volume"
+        },
+        {
+            "class_name": "CGamePlayerEquip",
+            "designer_name": "game_player_equip"
+        },
+        {
+            "class_name": "CMapSharedEnvironment",
+            "designer_name": "map_shared_environment"
+        },
+        {
+            "class_name": "CLogicRelay",
+            "designer_name": "logic_relay"
+        },
+        {
+            "class_name": "CTestPulseIO",
+            "designer_name": "test_io_combinations"
+        },
+        {
+            "class_name": "CLogicDistanceCheck",
+            "designer_name": "logic_distance_check"
+        },
+        {
+            "class_name": "CLogicBranch",
+            "designer_name": "logic_branch"
+        },
+        {
+            "class_name": "CItemGeneric",
+            "designer_name": "item_generic"
+        },
+        {
+            "class_name": "CItemGenericTriggerHelper",
+            "designer_name": "item_generic_trigger_helper"
+        },
+        {
+            "class_name": "CInfoData",
+            "designer_name": "info_data"
+        },
+        {
+            "class_name": "CFuncRotator",
+            "designer_name": "func_rotator"
+        },
+        {
+            "class_name": "CRotatorTarget",
+            "designer_name": "rotator_target"
+        },
+        {
+            "class_name": "CFuncRotating",
+            "designer_name": "func_rotating"
+        },
+        {
+            "class_name": "CFuncMover",
+            "designer_name": "func_mover"
+        },
+        {
+            "class_name": "CPathMover",
+            "designer_name": "path_mover"
+        },
+        {
+            "class_name": "CPathMoverEntitySpawner",
+            "designer_name": "path_mover_entity_spawner"
+        },
+        {
+            "class_name": "CMoverPathNode",
+            "designer_name": "path_node_mover"
+        },
+        {
+            "class_name": "CFuncMoveLinear",
+            "designer_name": "func_movelinear"
+        },
+        {
+            "class_name": "CBreakable",
+            "designer_name": "func_breakable"
+        },
+        {
+            "class_name": "CFishPool",
+            "designer_name": "func_fish_pool"
+        },
+        {
+            "class_name": "CFish",
+            "designer_name": "fish"
+        },
+        {
+            "class_name": "CMessage",
+            "designer_name": "env_message"
+        },
+        {
+            "class_name": "CEnvLaser",
+            "designer_name": "env_laser"
+        },
+        {
+            "class_name": "CEnvDecal",
+            "designer_name": "env_decal"
+        },
+        {
+            "class_name": "CEntityFlame",
+            "designer_name": "entityflame"
+        },
+        {
+            "class_name": "CEntityDissolve",
+            "designer_name": "env_entity_dissolver"
+        },
+        {
+            "class_name": "CEntityBlocker",
+            "designer_name": "entity_blocker"
+        },
+        {
+            "class_name": "CDynamicProp",
+            "designer_name": "prop_dynamic"
+        },
+        {
+            "class_name": "CBaseDoor",
+            "designer_name": "func_door"
+        },
+        {
+            "class_name": "CRagdollMagnet",
+            "designer_name": "phys_ragdollmagnet"
+        },
+        {
+            "class_name": "CColorCorrection",
+            "designer_name": "color_correction"
+        },
+        {
+            "class_name": "CMomentaryRotButton",
+            "designer_name": "momentary_rot_button"
+        },
+        {
+            "class_name": "CRotButton",
+            "designer_name": "func_rot_button"
+        },
+        {
+            "class_name": "CPhysicalButton",
+            "designer_name": "func_physical_button"
+        },
+        {
+            "class_name": "CBaseButton",
+            "designer_name": "func_button"
+        },
+        {
+            "class_name": "CBasePlayerPawn",
+            "designer_name": "baseplayerpawn"
+        },
+        {
+            "class_name": "CBaseModelEntity",
+            "designer_name": "basemodelentity"
+        },
+        {
+            "class_name": "CBaseAnimGraph",
+            "designer_name": "baseanimgraph"
+        },
+        {
+            "class_name": "CAmbientGeneric",
+            "designer_name": "ambient_generic"
+        },
+        {
+            "class_name": "CTriggerSoundscape",
+            "designer_name": "trigger_soundscape"
+        },
+        {
+            "class_name": "CEnvSoundscape",
+            "designer_name": "env_soundscape"
+        },
+        {
+            "class_name": "CSpriteOriented",
+            "designer_name": "env_sprite_oriented"
+        },
+        {
+            "class_name": "CSprite",
+            "designer_name": "env_sprite"
+        },
+        {
+            "class_name": "CSoundOpvarSetOBBWindEntity",
+            "designer_name": "snd_opvar_set_wind_obb"
+        },
+        {
+            "class_name": "CSoundOpvarSetAutoRoomEntity",
+            "designer_name": "snd_opvar_set_auto_room"
+        },
+        {
+            "class_name": "CSoundOpvarSetPathCornerEntity",
+            "designer_name": "snd_opvar_set_path_corner"
+        },
+        {
+            "class_name": "CSoundOpvarSetOBBEntity",
+            "designer_name": "snd_opvar_set_obb"
+        },
+        {
+            "class_name": "CSoundOpvarSetAABBEntity",
+            "designer_name": "snd_opvar_set_aabb"
+        },
+        {
+            "class_name": "CSoundOpvarSetPointEntity",
+            "designer_name": "snd_opvar_set_point"
+        },
+        {
+            "class_name": "CSoundOpvarSetPointBase",
+            "designer_name": "snd_opvar_set_point_base"
+        },
+        {
+            "class_name": "CFuncShatterglass",
+            "designer_name": "func_shatterglass"
+        },
+        {
+            "class_name": "CShatterGlassShardPhysics",
+            "designer_name": "shatterglass_shard"
+        },
+        {
+            "class_name": "CFuncLadder",
+            "designer_name": "func_ladder"
+        },
+        {
+            "class_name": "CInfoLadderDismount",
+            "designer_name": "info_ladder_dismount"
+        },
+        {
+            "class_name": "CEnvDetailController",
+            "designer_name": "env_detail_controller"
+        },
+        {
+            "class_name": "CBeam",
+            "designer_name": "beam"
+        },
+        {
+            "class_name": "CTriggerFan",
+            "designer_name": "trigger_fan"
+        },
+        {
+            "class_name": "CInfoFan",
+            "designer_name": "info_trigger_fan"
+        },
+        {
+            "class_name": "CTeam",
+            "designer_name": "team_manager"
+        },
+        {
+            "class_name": "CSoundEventParameter",
+            "designer_name": "snd_event_param"
+        },
+        {
+            "class_name": "CSoundEventPathCornerEntity",
+            "designer_name": "snd_event_path_corner"
+        },
+        {
+            "class_name": "CSoundEventConeEntity",
+            "designer_name": "snd_event_cone"
+        },
+        {
+            "class_name": "CSoundEventSphereEntity",
+            "designer_name": "snd_event_sphere"
+        },
+        {
+            "class_name": "CSoundEventOBBEntity",
+            "designer_name": "snd_event_orientedbox"
+        },
+        {
+            "class_name": "CSoundEventAABBEntity",
+            "designer_name": "snd_event_alignedbox"
+        },
+        {
+            "class_name": "CSoundEventEntity",
+            "designer_name": "point_soundevent"
+        },
+        {
+            "class_name": "CSoundStackSave",
+            "designer_name": "snd_stack_save"
+        },
+        {
+            "class_name": "CSoundAreaEntityOrientedBox",
+            "designer_name": "snd_sound_area_obb"
+        },
+        {
+            "class_name": "CSoundAreaEntitySphere",
+            "designer_name": "snd_sound_area_sphere"
+        },
+        {
+            "class_name": "CSoundAreaEntityBase",
+            "designer_name": "snd_sound_area_base"
+        },
+        {
+            "class_name": "CRagdollManager",
+            "designer_name": "game_ragdoll_manager"
+        },
+        {
+            "class_name": "CGameGibManager",
+            "designer_name": "game_gib_manager"
+        },
+        {
+            "class_name": "CPostProcessingVolume",
+            "designer_name": "post_processing_volume"
+        },
+        {
+            "class_name": "CPointTemplate",
+            "designer_name": "point_template"
+        },
+        {
+            "class_name": "CPointOrient",
+            "designer_name": "point_orient"
+        },
+        {
+            "class_name": "CPointChildModifier",
+            "designer_name": "point_childmodifier"
+        },
+        {
+            "class_name": "CPointCameraVFOV",
+            "designer_name": "point_camera_vertical_fov"
+        },
+        {
+            "class_name": "CPointCamera",
+            "designer_name": "point_camera"
+        },
+        {
+            "class_name": "CMultiLightProxy",
+            "designer_name": "logic_multilight_proxy"
+        },
+        {
+            "class_name": "CLightEnvironmentEntity",
+            "designer_name": "light_environment"
+        },
+        {
+            "class_name": "CLightDirectionalEntity",
+            "designer_name": "light_directional"
+        },
+        {
+            "class_name": "CLightOrthoEntity",
+            "designer_name": "light_ortho"
+        },
+        {
+            "class_name": "CLightSpotEntity",
+            "designer_name": "light_spot"
+        },
+        {
+            "class_name": "CLightEntity",
+            "designer_name": "light_omni"
+        },
+        {
+            "class_name": "CInfoWorldLayer",
+            "designer_name": "info_world_layer"
+        },
+        {
+            "class_name": "CInfoVisibilityBox",
+            "designer_name": "info_visibility_box"
+        },
+        {
+            "class_name": "CChoreoInfoTarget",
+            "designer_name": "info_target_choreo"
+        },
+        {
+            "class_name": "CInfoParticleTarget",
+            "designer_name": "info_particle_target"
+        },
+        {
+            "class_name": "CInfoTarget",
+            "designer_name": "info_target"
+        },
+        {
+            "class_name": "CInfoTargetServerOnly",
+            "designer_name": "info_target_server_only"
+        },
+        {
+            "class_name": "CFogTrigger",
+            "designer_name": "trigger_fog"
+        },
+        {
+            "class_name": "CFogController",
+            "designer_name": "env_fog_controller"
+        },
+        {
+            "class_name": "CEnvWindVolume",
+            "designer_name": "env_wind_volume"
+        },
+        {
+            "class_name": "CEnvWindController",
+            "designer_name": "env_wind_controller"
+        },
+        {
+            "class_name": "CEnvVolumetricFogVolume",
+            "designer_name": "env_volumetric_fog_volume"
+        },
+        {
+            "class_name": "CEnvVolumetricFogController",
+            "designer_name": "env_volumetric_fog_controller"
+        },
+        {
+            "class_name": "CTonemapTrigger",
+            "designer_name": "trigger_tonemap"
+        },
+        {
+            "class_name": "CTonemapController2",
+            "designer_name": "env_tonemap_controller"
+        },
+        {
+            "class_name": "CEnvSky",
+            "designer_name": "env_sky"
+        },
+        {
+            "class_name": "CPlayerVisibility",
+            "designer_name": "env_player_visibility"
+        },
+        {
+            "class_name": "CEnvLightProbeVolume",
+            "designer_name": "env_light_probe_volume"
+        },
+        {
+            "class_name": "CGradientFog",
+            "designer_name": "env_gradient_fog"
+        },
+        {
+            "class_name": "CEnvCubemapFog",
+            "designer_name": "env_cubemap_fog"
+        },
+        {
+            "class_name": "CEnvCubemapBox",
+            "designer_name": "env_cubemap_box"
+        },
+        {
+            "class_name": "CEnvCubemap",
+            "designer_name": "env_cubemap"
+        },
+        {
+            "class_name": "CEnvCombinedLightProbeVolume",
+            "designer_name": "env_combined_light_probe_volume"
+        },
+        {
+            "class_name": "CBaseTrigger",
+            "designer_name": "trigger"
+        },
+        {
+            "class_name": "CPointEntity",
+            "designer_name": "point_entity"
+        },
+        {
+            "class_name": "CHEGrenadeProjectile",
+            "designer_name": "hegrenade_projectile"
+        },
+        {
+            "class_name": "CFlashbangProjectile",
+            "designer_name": "flashbang_projectile"
+        },
+        {
+            "class_name": "COmniLight",
+            "designer_name": "light_omni2"
+        },
+        {
+            "class_name": "CRectLight",
+            "designer_name": "light_rect"
+        },
+        {
+            "class_name": "CBarnLight",
+            "designer_name": "light_barn"
+        },
+        {
+            "class_name": "CHostage",
+            "designer_name": "hostage_entity"
+        },
+        {
+            "class_name": "CInferno",
+            "designer_name": "inferno"
+        },
+        {
+            "class_name": "CChicken",
+            "designer_name": "chicken"
+        },
+        {
+            "class_name": "CPlayerSprayDecal",
+            "designer_name": "player_spray_decal"
+        },
+        {
+            "class_name": "CMapInfo",
+            "designer_name": "info_map_parameters"
+        },
+        {
+            "class_name": "CGameMoney",
+            "designer_name": "game_money"
+        },
+        {
+            "class_name": "CLogicEventListener",
+            "designer_name": "logic_eventlistener"
+        },
+        {
+            "class_name": "CFuncConveyor",
+            "designer_name": "func_conveyor"
+        },
+        {
+            "class_name": "CBuyZone",
+            "designer_name": "func_buyzone"
+        },
+        {
+            "class_name": "CEnvHudHint",
+            "designer_name": "env_hudhint"
+        },
+        {
+            "class_name": "CMapVetoPickController",
+            "designer_name": "mapvetopick_controller"
+        },
+        {
+            "class_name": "CVoteController",
+            "designer_name": "vote_controller"
+        },
+        {
+            "class_name": "CTriggerHostageReset",
+            "designer_name": "trigger_hostage_reset"
+        },
+        {
+            "class_name": "CTriggerBombReset",
+            "designer_name": "trigger_bomb_reset"
+        },
+        {
+            "class_name": "CCSTeam",
+            "designer_name": "cs_team_manager"
+        },
+        {
+            "class_name": "CCSPointScriptEntity",
+            "designer_name": "point_script"
+        },
+        {
+            "class_name": "CCSPlayerPawn",
+            "designer_name": "player"
+        },
+        {
+            "class_name": "CCSPlace",
+            "designer_name": "env_cs_place"
+        },
+        {
+            "class_name": "CCSObserverPawn",
+            "designer_name": "observer"
+        },
+        {
+            "class_name": "CItemKevlar",
+            "designer_name": "item_kevlar"
+        },
+        {
+            "class_name": "CItemDefuser",
+            "designer_name": "item_cutters"
+        },
+        {
+            "class_name": "CItemAssaultSuit",
+            "designer_name": "item_assaultsuit"
+        },
+        {
+            "class_name": "CInfoDynamicShadowHintBox",
+            "designer_name": "info_dynamic_shadow_hint_box"
+        },
+        {
+            "class_name": "CInfoDynamicShadowHint",
+            "designer_name": "info_dynamic_shadow_hint"
+        },
+        {
+            "class_name": "CPointClientUIWorldTextPanel",
+            "designer_name": "point_clientui_world_text_panel"
+        },
+        {
+            "class_name": "CPointClientUIWorldPanel",
+            "designer_name": "point_clientui_world_panel"
+        },
+        {
+            "class_name": "CPointClientUIDialog",
+            "designer_name": "point_clientui_dialog"
+        },
+        {
+            "class_name": "CInfoOffscreenPanoramaTexture",
+            "designer_name": "info_offscreen_panorama_texture"
+        },
+        {
+            "class_name": "CEntityInstance",
+            "designer_name": "root"
+        },
+        {
+            "class_name": "CSprite",
+            "designer_name": "env_glow"
+        },
+        {
+            "class_name": "CSceneEntity",
+            "designer_name": "logic_choreographed_scene"
+        },
+        {
+            "class_name": "CRopeKeyframe",
+            "designer_name": "move_rope"
+        },
+        {
+            "class_name": "CRagdollProp",
+            "designer_name": "physics_prop_ragdoll"
+        },
+        {
+            "class_name": "CPhysHinge",
+            "designer_name": "phys_hinge_local"
+        },
+        {
+            "class_name": "CFuncMoveLinear",
+            "designer_name": "momentary_door"
+        },
+        {
+            "class_name": "CFuncLadder",
+            "designer_name": "func_useableladder"
+        },
+        {
+            "class_name": "CPathParticleRope",
+            "designer_name": "path_particle_rope_clientside"
+        },
+        {
+            "class_name": "CDynamicProp",
+            "designer_name": "cable_dynamic"
+        },
+        {
+            "class_name": "CDynamicProp",
+            "designer_name": "prop_dynamic_override"
+        },
+        {
+            "class_name": "CDynamicProp",
+            "designer_name": "dynamic_prop"
+        },
+        {
+            "class_name": "CEnvSoundscapeTriggerable",
+            "designer_name": "snd_soundscape_triggerable"
+        },
+        {
+            "class_name": "CEnvSoundscape",
+            "designer_name": "snd_soundscape"
+        },
+        {
+            "class_name": "CEnvSoundscapeProxy",
+            "designer_name": "snd_soundscape_proxy"
+        },
+        {
+            "class_name": "CSoundEventEntity",
+            "designer_name": "snd_event_point"
+        },
+        {
+            "class_name": "CTonemapController2",
+            "designer_name": "env_tonemap_controller2"
+        },
+        {
+            "class_name": "CHostage",
+            "designer_name": "info_hostage_spawn"
+        },
+        {
+            "class_name": "CItemDefuser",
+            "designer_name": "item_defuser"
+        }
+    ]
+}

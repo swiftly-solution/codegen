@@ -10,15 +10,16 @@ public static class GeneratorOptions
     /// <summary>
     /// Dictionary of available generators mapped by their display name
     /// </summary>
-    private static readonly Dictionary<string, Func<string?, string?, string?, string?, BaseGenerator>> GeneratorFactories = new()
+    private static readonly Dictionary<string, Func<string?, string?, string?, string?, string?, BaseGenerator>> GeneratorFactories = new()
     {
-        { "Natives", (nativesPath, _, _, _) => new Natives(nativesPath) },
-        { "Game Events", (_, gameEventsPath, _, _) => new GameEvents(gameEventsPath) },
-        { "Protobufs", (_, _, protobufsPath, _) => new Protobufs(protobufsPath) },
-        { "Datamaps", (_, _, _, datamapsPath) => new Datamaps(datamapsPath!) }
+        { "Natives", (nativesPath, _, _, _, _) => new Natives(nativesPath) },
+        { "Game Events", (_, gameEventsPath, _, _, _) => new GameEvents(gameEventsPath) },
+        { "Protobufs", (_, _, protobufsPath, _, _) => new Protobufs(protobufsPath) },
+        { "Datamaps", (_, _, _, datamapsPath, _) => new Datamaps(datamapsPath!) },
+        { "Schemas", (_, _, _, _, schemaPath) => new SchemaGenerator(schemaPath!) }
     };
 
-    public static async Task ShowGeneratorOptionsAsync(string? nativesPath, string? gameEventsPath, string? protobufsPath = null, string? datamapsPath = null)
+    public static async Task ShowGeneratorOptionsAsync(string? nativesPath, string? gameEventsPath, string? protobufsPath = null, string? datamapsPath = null, string? schemaPath = null)
     {
         var selectedGenerators = AnsiConsole.Prompt(
             new MultiSelectionPrompt<string>()
@@ -116,12 +117,32 @@ public static class GeneratorOptions
             }
         }
 
+        if (selectedGenerators.Contains("Schemas") && string.IsNullOrEmpty(schemaPath))
+        {
+            var defaultSchemaPath = Path.Combine(Entrypoint.ProjectRootPath, "data", "schema");
+            if (Directory.Exists(defaultSchemaPath))
+            {
+                var useDefault = AnsiConsole.Confirm($"Use default schema path: [grey]{defaultSchemaPath}[/]?", true);
+                if (useDefault)
+                {
+                    schemaPath = defaultSchemaPath;
+                }
+            }
+
+            if (string.IsNullOrEmpty(schemaPath))
+            {
+                AnsiConsole.MarkupLine("[yellow]Please select the schema folder:[/]");
+                schemaPath = Entrypoint.BrowseForDirectory("Browse for Schema Folder", Entrypoint.ProjectRootPath);
+                AnsiConsole.MarkupLine($"[green]Selected schema path:[/] {schemaPath}");
+            }
+        }
+
         AnsiConsole.WriteLine();
         var startTime = DateTime.Now;
 
         var generators = selectedGenerators.ToDictionary(
             name => name,
-            name => GeneratorFactories[name](nativesPath, gameEventsPath, protobufsPath, datamapsPath)
+            name => GeneratorFactories[name](nativesPath, gameEventsPath, protobufsPath, datamapsPath, schemaPath)
         );
 
         var generatorStatus = new Dictionary<string, GeneratorState>();

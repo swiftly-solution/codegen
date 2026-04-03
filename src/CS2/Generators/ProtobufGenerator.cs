@@ -1,6 +1,5 @@
 using System.Text;
 using Google.Protobuf.Reflection;
-using ProtoBuf.Reflection;
 
 namespace SwiftlyS2.Codegen.CS2.Generators;
 
@@ -102,7 +101,7 @@ public class Protobufs : BaseGenerator
     /// <param name="protobufsPath">Path to the protobufs folder</param>
     public Protobufs(string? protobufsPath = null)
     {
-        _protobufsPath = protobufsPath ?? Path.Combine(Entrypoint.ProjectRootPath, "protobufs", "cs2");
+        _protobufsPath = protobufsPath ?? Path.Combine(Entrypoint.ProjectRootPath, "data", "protobufs", "cs2");
     }
 
     /// <inheritdoc />

@@ -1,0 +1,12 @@
+{
+    "blacklistedClasses": [
+        "FeSimdTri_t",
+        "CTakeDamageInfo",
+        "CTakeDamageResult",
+        "CNetworkVarChainer",
+        "CVariantDefaultAllocator",
+        "CEntityIOOutput",
+        "ChangeAccessorFieldPathIndex_t",
+        "CEntityKeyValues"
+    ]
+}

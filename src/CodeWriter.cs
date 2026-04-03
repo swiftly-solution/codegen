@@ -202,6 +202,11 @@ public class CodeWriter
         }
     }
 
+    public void RemoveLine()
+    {
+        lines.RemoveAt(lines.Count - 1);
+    }
+
     /// <summary>
     /// Adds multiple lines of code with automatic indentation
     /// </summary>

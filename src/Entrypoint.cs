@@ -37,6 +37,7 @@ public static class Entrypoint
         string? gameEventsPath = null;
         string? protobufsPath = null;
         string? datamapsPath = null;
+        string? schemaPath = null;
 
         for (int i = 0; i < args.Length; i++)
         {
@@ -60,6 +61,11 @@ public static class Entrypoint
                 datamapsPath = args[i + 1];
                 i++;
             }
+            else if ((args[i] == "--schema-path" || args[i] == "-schema") && i + 1 < args.Length)
+            {
+                schemaPath = args[i + 1];
+                i++;
+            }
             else if (args[i] == "--help" || args[i] == "-h")
             {
                 ShowHelp();
@@ -78,7 +84,7 @@ public static class Entrypoint
         switch (gameChoice)
         {
             case "Counter-Strike: 2":
-                await CS2.GeneratorOptions.ShowGeneratorOptionsAsync(nativesPath, gameEventsPath, protobufsPath, datamapsPath);
+                await CS2.GeneratorOptions.ShowGeneratorOptionsAsync(nativesPath, gameEventsPath, protobufsPath, datamapsPath, schemaPath);
                 break;
             default:
                 AnsiConsole.MarkupLine("[red]Error:[/] Unknown game selected.");
@@ -98,6 +104,7 @@ public static class Entrypoint
         AnsiConsole.MarkupLine("  -g, --gameevents-path <path>   Path to the game events folder");
         AnsiConsole.MarkupLine("  -p, --protobufs-path <path>    Path to the protobufs folder");
         AnsiConsole.MarkupLine("  -d, --datamaps-path <path>     Path to the datamaps.json file");
+        AnsiConsole.MarkupLine("  -schema, --schema-path <path>  Path to the schema folder");
         AnsiConsole.MarkupLine("  -h, --help                     Show this help message");
         AnsiConsole.WriteLine();
         AnsiConsole.MarkupLine("[bold]Examples:[/]");
