@@ -437,24 +437,12 @@ public class GameEvents : BaseGenerator
                 continue;
             }
 
-            (string CsType, string Accessor, bool CanSet, string? CastKind) typeInfo;
-            var overridden = false;
-            if (FieldOverrides.TryGetValue((ev.Name, fname), out var ov))
-            {
-                typeInfo = ov;
-                overridden = true;
-            }
-            else if (TypeMap.TryGetValue(ftype, out var defaultInfo))
-            {
-                typeInfo = defaultInfo;
-            }
-            else
-            {
+            if (!TypeMap.TryGetValue(ftype, out var defaultInfo))
                 continue;
-            }
 
-            var (csType, _, canSet, _) = typeInfo;
+            var (csType, _, canSet, _) = defaultInfo;
             var propName = GetUniquePropName(ToPropertyName(fname), usedPropNames);
+            var hasOverride = FieldOverrides.TryGetValue((ev.Name, fname), out var ov);
 
             writer.AddLine();
             writer.AddLine("/// <summary>");
@@ -463,9 +451,33 @@ public class GameEvents : BaseGenerator
                 writer.AddLine($"/// {fdef.Comment}");
                 writer.AddLine("/// <br/>");
             }
-            writer.AddLine(overridden ? $"/// type: {ftype} (overridden to {csType})" : $"/// type: {ftype}");
+            writer.AddLine($"/// type: {ftype}");
+            if (hasOverride)
+            {
+                writer.AddLine("/// <br/>");
+                writer.AddLine($"/// See <see cref=\"Actual{propName}\"/>.");
+            }
             writer.AddLine("/// </summary>");
+            if (hasOverride)
+                writer.AddLine($"[Obsolete(\"The declared type may not match the actual value. Use Actual{propName} instead.\")]");
             writer.AddLine($"{csType} {propName} {{ get; {(canSet ? "set; " : "")}}}");
+
+            if (hasOverride)
+            {
+                var (ovCsType, _, ovCanSet, _) = ov;
+                var actualName = GetUniquePropName($"Actual{propName}", usedPropNames);
+
+                writer.AddLine();
+                writer.AddLine("/// <summary>");
+                if (!string.IsNullOrEmpty(fdef.Comment))
+                {
+                    writer.AddLine($"/// {fdef.Comment}");
+                    writer.AddLine("/// <br/>");
+                }
+                writer.AddLine($"/// type: {ovCsType}");
+                writer.AddLine("/// </summary>");
+                writer.AddLine($"{ovCsType} {actualName} {{ get; {(ovCanSet ? "set; " : "")}}}");
+            }
         }
     }
 
@@ -529,24 +541,13 @@ public class GameEvents : BaseGenerator
                 continue;
             }
 
-            (string CsType, string Accessor, bool CanSet, string? CastKind) typeInfo;
-            if (FieldOverrides.TryGetValue((ev.Name, fname), out var ov))
-            {
-                typeInfo = ov;
-            }
-            else if (TypeMap.TryGetValue(ftype, out var defaultInfo))
-            {
-                typeInfo = defaultInfo;
-            }
-            else
-            {
+            if (!TypeMap.TryGetValue(ftype, out var defaultInfo))
                 continue;
-            }
 
-            var (csType, accessor, canSet, castKind) = typeInfo;
+            var (csType, accessor, canSet, castKind) = defaultInfo;
             var propName = GetUniquePropName(ToPropertyName(fname), usedPropNames);
-
             var (getter, setter) = BuildAccessors(fname, accessor, castKind);
+            var hasOverride = FieldOverrides.TryGetValue((ev.Name, fname), out var ov);
 
             writer.AddLine();
             if (!string.IsNullOrEmpty(fdef.Comment))
@@ -556,6 +557,22 @@ public class GameEvents : BaseGenerator
                 writer.AddLine($"{{ get => {getter}; set => {setter}; }}");
             else
                 writer.AddLine($"{{ get => {getter}; }}");
+
+            if (hasOverride)
+            {
+                var (ovCsType, ovAccessor, ovCanSet, ovCastKind) = ov;
+                var actualName = GetUniquePropName($"Actual{propName}", usedPropNames);
+                var (ovGetter, ovSetter) = BuildAccessors(fname, ovAccessor, ovCastKind);
+
+                writer.AddLine();
+                if (!string.IsNullOrEmpty(fdef.Comment))
+                    writer.AddLine($"// {fdef.Comment}");
+                writer.AddLine($"public {ovCsType} {actualName}");
+                if (ovCanSet && ovSetter != null)
+                    writer.AddLine($"{{ get => {ovGetter}; set => {ovSetter}; }}");
+                else
+                    writer.AddLine($"{{ get => {ovGetter}; }}");
+            }
         }
     }
 
