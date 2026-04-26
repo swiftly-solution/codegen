@@ -58,16 +58,16 @@ public class Protobufs : BaseGenerator
         "BytesValue",
     };
 
-    private static readonly Dictionary<string, (string Prefix, string MessagePrefix)> NetMessageEnums = new()
+    private static readonly Dictionary<string, (string Prefix, List<string> MessagePrefixes)> NetMessageEnums = new()
     {
-        { "EBaseUserMessages", ("UM_", "CUserMessage") },
-        { "ETEProtobufIds", ("TE_", "CMsgTE") },
-        { "ECsgoGameEvents", ("GE_", "CMsgTE") },
-        { "ECstrike15UserMessages", ("CS_UM_", "CCSUsrMsg_") },
-        { "EBaseGameEvents", ("GE_", "CMsg") },
-        { "CLC_Messages", ("clc_", "CCLCMsg_") },
-        { "SVC_Messages", ("svc_", "CSVCMsg_") },
-        { "NET_Messages", ("net_", "CNETMsg_") }
+        { "EBaseUserMessages", ("UM_", ["CUserMessage", "CUserMsg_"] ) },
+        { "ETEProtobufIds", ("TE_", ["CMsgTE"] ) },
+        { "ECsgoGameEvents", ("GE_", ["CMsgTE"] ) },
+        { "ECstrike15UserMessages", ("CS_UM_", ["CCSUsrMsg_"] ) },
+        { "EBaseGameEvents", ("GE_", ["CMsg"] ) },
+        { "CLC_Messages", ("clc_", ["CCLCMsg_"] ) },
+        { "SVC_Messages", ("svc_", ["CSVCMsg_"] ) },
+        { "NET_Messages", ("net_", ["CNETMsg_"] ) }
     };
 
     private static readonly Dictionary<string, (string AccessorType, string CsType)> BaseTypes = new()
@@ -261,7 +261,7 @@ public class Protobufs : BaseGenerator
                 if (!NetMessageEnums.TryGetValue(enumProto.Name, out var enumInfo))
                     continue;
 
-                var (enumPrefix, messagePrefix) = enumInfo;
+                var (enumPrefix, messagePrefixes) = enumInfo;
                 var handledEnumFields = new HashSet<string>();
 
                 foreach (var enumField in enumProto.Values)
@@ -282,13 +282,15 @@ public class Protobufs : BaseGenerator
 
                     foreach (var message in messages)
                     {
-                        if (message.Name.Contains(messagePrefix) && message.Name.Contains(name))
-                        {
-                            Progress.Report($"Generating net message: {message.Name} = {enumField.Number}");
-                            handledEnumFields.Add(enumField.Name);
-                            handledMessages.Add(message);
-                            WriteNetMessage(message, outInterfaces, outClasses, enumField.Number);
-                            break;
+                        foreach(var messagePrefix in messagePrefixes) {
+                            if (message.Name.Contains(messagePrefix) && message.Name.Contains(name))
+                            {
+                                Progress.Report($"Generating net message: {message.Name} = {enumField.Number}");
+                                handledEnumFields.Add(enumField.Name);
+                                handledMessages.Add(message);
+                                WriteNetMessage(message, outInterfaces, outClasses, enumField.Number);
+                                break;
+                            }
                         }
                     }
                 }
