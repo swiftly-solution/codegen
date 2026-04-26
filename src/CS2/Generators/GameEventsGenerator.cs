@@ -29,6 +29,22 @@ public class GameEvents : BaseGenerator
         { "ehandle", ("nint", "Ptr", true, null) }
     };
 
+    /// <summary>
+    /// Force a specific C# type for a given event field, overriding the type declared in the .gameevents file.
+    /// </summary>
+    private static readonly Dictionary<(string Event, string Field), (string CsType, string Accessor, bool CanSet, string? CastKind)> FieldOverrides = new()
+    {
+        { ("player_hurt", "health"),     ("int", "Int", true, null) },
+        { ("player_hurt", "armor"),      ("int", "Int", true, null) },
+        { ("player_hurt", "dmg_health"), ("int", "Int", true, null) },
+        { ("player_hurt", "dmg_armor"),  ("int", "Int", true, null) },
+        { ("player_hurt", "hitgroup"),   (CS2SchemaType.HitGroup_t, "Int", true, CS2SchemaType.HitGroup_t) },
+
+        { ("player_death", "dmg_health"), ("int", "Int", true, null) },
+        { ("player_death", "dmg_armor"),  ("int", "Int", true, null) },
+        { ("player_death", "hitgroup"),   (CS2SchemaType.HitGroup_t, "Int", true, CS2SchemaType.HitGroup_t) },
+    };
+
     private static readonly HashSet<string> SkipTypes = new() { "none", "local" };
 
     private static readonly Regex EventNameRegex = new(@"^\s*""([^""]+)""");
@@ -362,7 +378,7 @@ public class GameEvents : BaseGenerator
         });
 
         var filePath = Path.Combine(outputDir, $"{typeName}.cs");
-        File.WriteAllText(filePath, writer.GetCode() + "\n");
+        File.WriteAllText(filePath, writer.GetCode("\r\n") + "\r\n");
     }
 
     private void GenerateClass(GameEventDef ev, string outputDir)
@@ -393,7 +409,7 @@ public class GameEvents : BaseGenerator
         });
 
         var filePath = Path.Combine(outputDir, $"{typeName}Impl.cs");
-        File.WriteAllText(filePath, writer.GetCode() + "\n");
+        File.WriteAllText(filePath, writer.GetCode("\r\n") + "\r\n");
     }
 
     private void RenderHeaderComment(CodeWriter writer, GameEventDef ev)
@@ -421,11 +437,12 @@ public class GameEvents : BaseGenerator
                 continue;
             }
 
-            if (!TypeMap.TryGetValue(ftype, out var typeInfo))
+            if (!TypeMap.TryGetValue(ftype, out var defaultInfo))
                 continue;
 
-            var (csType, _, canSet, _) = typeInfo;
+            var (csType, _, canSet, _) = defaultInfo;
             var propName = GetUniquePropName(ToPropertyName(fname), usedPropNames);
+            var hasOverride = FieldOverrides.TryGetValue((ev.Name, fname), out var ov);
 
             writer.AddLine();
             writer.AddLine("/// <summary>");
@@ -435,8 +452,32 @@ public class GameEvents : BaseGenerator
                 writer.AddLine("/// <br/>");
             }
             writer.AddLine($"/// type: {ftype}");
+            if (hasOverride)
+            {
+                writer.AddLine("/// <br/>");
+                writer.AddLine($"/// See <see cref=\"Actual{propName}\"/>.");
+            }
             writer.AddLine("/// </summary>");
+            if (hasOverride)
+                writer.AddLine($"[Obsolete(\"The declared type may not match the actual value. Use Actual{propName} instead.\")]");
             writer.AddLine($"{csType} {propName} {{ get; {(canSet ? "set; " : "")}}}");
+
+            if (hasOverride)
+            {
+                var (ovCsType, _, ovCanSet, _) = ov;
+                var actualName = GetUniquePropName($"Actual{propName}", usedPropNames);
+
+                writer.AddLine();
+                writer.AddLine("/// <summary>");
+                if (!string.IsNullOrEmpty(fdef.Comment))
+                {
+                    writer.AddLine($"/// {fdef.Comment}");
+                    writer.AddLine("/// <br/>");
+                }
+                writer.AddLine($"/// type: {ovCsType}");
+                writer.AddLine("/// </summary>");
+                writer.AddLine($"{ovCsType} {actualName} {{ get; {(ovCanSet ? "set; " : "")}}}");
+            }
         }
     }
 
@@ -500,13 +541,13 @@ public class GameEvents : BaseGenerator
                 continue;
             }
 
-            if (!TypeMap.TryGetValue(ftype, out var typeInfo))
+            if (!TypeMap.TryGetValue(ftype, out var defaultInfo))
                 continue;
 
-            var (csType, accessor, canSet, castKind) = typeInfo;
+            var (csType, accessor, canSet, castKind) = defaultInfo;
             var propName = GetUniquePropName(ToPropertyName(fname), usedPropNames);
-
             var (getter, setter) = BuildAccessors(fname, accessor, castKind);
+            var hasOverride = FieldOverrides.TryGetValue((ev.Name, fname), out var ov);
 
             writer.AddLine();
             if (!string.IsNullOrEmpty(fdef.Comment))
@@ -516,6 +557,22 @@ public class GameEvents : BaseGenerator
                 writer.AddLine($"{{ get => {getter}; set => {setter}; }}");
             else
                 writer.AddLine($"{{ get => {getter}; }}");
+
+            if (hasOverride)
+            {
+                var (ovCsType, ovAccessor, ovCanSet, ovCastKind) = ov;
+                var actualName = GetUniquePropName($"Actual{propName}", usedPropNames);
+                var (ovGetter, ovSetter) = BuildAccessors(fname, ovAccessor, ovCastKind);
+
+                writer.AddLine();
+                if (!string.IsNullOrEmpty(fdef.Comment))
+                    writer.AddLine($"// {fdef.Comment}");
+                writer.AddLine($"public {ovCsType} {actualName}");
+                if (ovCanSet && ovSetter != null)
+                    writer.AddLine($"{{ get => {ovGetter}; set => {ovSetter}; }}");
+                else
+                    writer.AddLine($"{{ get => {ovGetter}; }}");
+            }
         }
     }
 
@@ -564,6 +621,7 @@ public class GameEvents : BaseGenerator
             "Bool" => ($"Accessor.GetBool(\"{fname}\")", $"Accessor.SetBool(\"{fname}\", value)"),
             "Int" when castKind == "byte" => ($"(byte)Accessor.GetInt32(\"{fname}\")", $"Accessor.SetInt32(\"{fname}\", value)"),
             "Int" when castKind == "short" => ($"(short)Accessor.GetInt32(\"{fname}\")", $"Accessor.SetInt32(\"{fname}\", value)"),
+            "Int" when castKind != null => ($"({castKind})Accessor.GetInt32(\"{fname}\")", $"Accessor.SetInt32(\"{fname}\", (int)value)"),
             "Int" => ($"Accessor.GetInt32(\"{fname}\")", $"Accessor.SetInt32(\"{fname}\", value)"),
             "Uint64" => ($"Accessor.GetUInt64(\"{fname}\")", $"Accessor.SetUInt64(\"{fname}\", value)"),
             "Float" => ($"Accessor.GetFloat(\"{fname}\")", $"Accessor.SetFloat(\"{fname}\", value)"),
@@ -672,6 +730,10 @@ internal class EventField
         TypeName = typeName;
         Comment = comment ?? "";
     }
+}
+
+internal static class CS2SchemaType {
+    public const string HitGroup_t = "HitGroup_t";
 }
 
 internal class GameEventDef
