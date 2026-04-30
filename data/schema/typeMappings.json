@@ -52,7 +52,10 @@
         "HSCRIPT": "HSCRIPTHandler",
         "QuaternionStorage": "QuaternionStorage",
         "CEntityIOOutput": "CEntityIOOutput",
-        "CVariantBase<CVariantDefaultAllocator>": "CVariant<CVariantDefaultAllocator>"
+        "CVariantBase<CVariantDefaultAllocator>": "CVariant<CVariantDefaultAllocator>",
+        "CAnimGraph2ParamOptionalRef<float32>": "CAnimGraph2ParamOptionalRefFloat",
+        "CAnimGraph2ParamOptionalRef<bool>": "CAnimGraph2ParamOptionalRefBool",
+        "CAnimGraph2ParamOptionalRef<CGlobalSymbol>": "CAnimGraph2ParamOptionalRefCGlobalSymbol"
     },
     "managedTypes": [
         "SchemaClass",
@@ -79,7 +82,6 @@
         "PulseSymbol_t",
         "CColorGradient",
         "CPiecewiseCurve",
-        "CAnimGraph2ParamOptionalRef",
         "Range_t",
         "CAnimGraphParamRef",
         "bitfield",
