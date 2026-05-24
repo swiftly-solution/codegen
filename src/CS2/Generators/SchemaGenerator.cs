@@ -27,7 +27,7 @@ public class SchemaGenerator : BaseGenerator
         protected set { }
     }
 
-    private static HashSet<string> ErasedGenerics = [
+    private static readonly HashSet<string> ErasedGenerics = [
         "CUtlVector",
         "CUtlVectorFixedGrowable",
         "CUtlVectorEmbeddedNetworkVar",

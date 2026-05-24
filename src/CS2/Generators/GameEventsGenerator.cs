@@ -1,7 +1,5 @@
-using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
-using WordNinjaSharp;
 using WordNinjaSharp.App;
 
 namespace SwiftlyS2.Codegen.CS2.Generators;
@@ -29,12 +27,12 @@ public class GameEvents : BaseGenerator
         { "ehandle", ("nint", "Ptr", true, null) }
     };
 
-    private static readonly HashSet<string> SkipTypes = new() { "none", "local" };
+    private static readonly HashSet<string> SkipTypes = ["none", "local"];
 
     private static readonly Regex EventNameRegex = new(@"^\s*""([^""]+)""");
     private static readonly Regex FieldRegex = new(@"^\s*""([^""]+)""\s+""([^""]+)""(?:\s*//\s*(.*))?\s*$");
 
-    private readonly List<uint> hashes = new();
+    private readonly List<uint> hashes = [];
 
     /// <summary>
     /// Initializes a new instance of the GameEvents generator
@@ -151,15 +149,15 @@ public class GameEvents : BaseGenerator
             var events = await ParseGameEventsFileAsync(filePath);
             foreach (var (name, ev) in events)
             {
-                if (!allEvents.ContainsKey(name))
+                if (!allEvents.TryGetValue(name, out GameEventDef? value))
                 {
                     allEvents[name] = ev;
                 }
                 else
                 {
-                    foreach (var (fname, fdef) in ev.Fields)
+                    foreach (var (_, fdef) in ev.Fields)
                     {
-                        allEvents[name].AddField(fdef);
+                        value.AddField(fdef);
                     }
                 }
             }
@@ -215,7 +213,7 @@ public class GameEvents : BaseGenerator
                 continue;
             }
 
-            if (!lines[j].Trim().StartsWith("{"))
+            if (!lines[j].Trim().StartsWith('{'))
                 continue;
 
             i = j + 1;
@@ -245,13 +243,13 @@ public class GameEvents : BaseGenerator
             if (string.IsNullOrWhiteSpace(line) || line.StartsWith("//"))
                 continue;
 
-            if (line.StartsWith("}"))
+            if (line.StartsWith('}'))
             {
                 depth--;
                 continue;
             }
 
-            if (line.StartsWith("{"))
+            if (line.StartsWith('{'))
             {
                 depth++;
                 continue;
@@ -286,7 +284,7 @@ public class GameEvents : BaseGenerator
                     continue;
                 }
 
-                if (k < lines.Length && lines[k].Trim().StartsWith("{"))
+                if (k < lines.Length && lines[k].Trim().StartsWith('{'))
                 {
                     i = k + 1;
                     ParseEventBlock(lines, ref i, events, evName, evComment);
@@ -396,7 +394,7 @@ public class GameEvents : BaseGenerator
         File.WriteAllText(filePath, writer.GetCode() + "\n");
     }
 
-    private void RenderHeaderComment(CodeWriter writer, GameEventDef ev)
+    private static void RenderHeaderComment(CodeWriter writer, GameEventDef ev)
     {
         writer.AddLine("/// <summary>");
         writer.AddLine($"/// Event \"{ev.Name}\"");
@@ -556,7 +554,7 @@ public class GameEvents : BaseGenerator
         writer.AddLine($"{{ get => Accessor.GetInt32(\"{fname}\"); set => Accessor.SetInt32(\"{fname}\", value); }}");
     }
 
-    private (string getter, string? setter) BuildAccessors(string fname, string accessor, string? castKind)
+    private static (string getter, string? setter) BuildAccessors(string fname, string accessor, string? castKind)
     {
         return accessor switch
         {
@@ -574,19 +572,21 @@ public class GameEvents : BaseGenerator
         };
     }
 
-    private bool IsPlayerType(string ftype, string fname) =>
-        ftype == "player_controller" || ftype == "player_controller_and_pawn" || fname.ToLower() == "userid";
+    private static bool IsPlayerType(string ftype, string fname) =>
+        ftype == "player_controller" || ftype == "player_controller_and_pawn" || fname.Equals("userid", StringComparison.CurrentCultureIgnoreCase);
 
-    private string GetUniquePropName(string baseName, Dictionary<string, int> used)
+    private static string GetUniquePropName(string baseName, Dictionary<string, int> used)
     {
-        if (!used.ContainsKey(baseName))
+        if (!used.TryGetValue(baseName, out int value))
         {
-            used[baseName] = 1;
+            value = 1;
+
+            used[baseName] = value;
             return baseName;
         }
 
-        used[baseName]++;
-        return $"{baseName}{used[baseName]}";
+        used[baseName] = ++value;
+        return $"{baseName}{value}";
     }
 
     /// <summary>
@@ -594,10 +594,10 @@ public class GameEvents : BaseGenerator
     /// </summary>
     private string ToPropertyName(string field)
     {
-        if (field.ToLower() == "userid")
+        if (field.Equals("userid", StringComparison.CurrentCultureIgnoreCase))
             return "UserId";
 
-        if (field.Contains("_"))
+        if (field.Contains('_'))
             return ToPascalCase(field);
 
         if (Regex.IsMatch(field, @"^[a-z0-9]+$"))
@@ -616,12 +616,12 @@ public class GameEvents : BaseGenerator
         return char.ToUpper(tok[0]) + tok.Substring(1);
     }
 
-    private List<string> SplitConcatenatedLowercase(string word)
+    private static List<string> SplitConcatenatedLowercase(string word)
     {
         var s = word.ToLower();
 
         if (s == "assister")
-            return new List<string> { "Assister" };
+            return ["Assister"];
 
         var dictionaryPath = Path.Combine(Entrypoint.ProjectRootPath, "data", "wordninja.words.txt.gz");
         var tokens = WordNinja.Split(s, dictionaryPath);
@@ -631,7 +631,7 @@ public class GameEvents : BaseGenerator
     /// <summary>
     /// Convert event or field names to PascalCase identifiers
     /// </summary>
-    private string ToPascalCase(string name)
+    private static string ToPascalCase(string name)
     {
         name = Regex.Replace(name, @"[^0-9a-zA-Z_]", "_");
         var parts = name.Split('_', StringSplitOptions.RemoveEmptyEntries);
@@ -645,7 +645,7 @@ public class GameEvents : BaseGenerator
         return converted;
     }
 
-    private uint Fnv1a32(string text)
+    private static uint Fnv1a32(string text)
     {
         uint hash = 2166136261;
         foreach (var b in Encoding.UTF8.GetBytes(text))
@@ -674,23 +674,16 @@ internal class EventField
     }
 }
 
-internal class GameEventDef
+internal class GameEventDef(string name, string? comment = null)
 {
-    public string Name { get; }
-    public Dictionary<string, EventField> Fields { get; } = new();
-    public string Comment { get; set; }
-
-    public GameEventDef(string name, string? comment = null)
-    {
-        Name = name;
-        Comment = comment ?? "";
-    }
+    public string Name { get; } = name;
+    public Dictionary<string, EventField> Fields { get; } = [];
+    public string Comment { get; set; } = comment ?? "";
 
     public void AddField(EventField field)
     {
-        if (Fields.ContainsKey(field.Name))
+        if (Fields.TryGetValue(field.Name, out EventField? existing))
         {
-            var existing = Fields[field.Name];
             if (string.IsNullOrEmpty(existing.Comment) && !string.IsNullOrEmpty(field.Comment))
                 existing.Comment = field.Comment;
 

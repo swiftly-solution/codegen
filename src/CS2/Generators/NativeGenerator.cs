@@ -302,7 +302,7 @@ public class Natives : BaseGenerator
         }
     }
 
-    private void WriteWithFixedBlocks(CodeWriter writer, List<string> blocks, int index, Action finalAction)
+    private static void WriteWithFixedBlocks(CodeWriter writer, List<string> blocks, int index, Action finalAction)
     {
         if (index < blocks.Count)
         {
@@ -377,7 +377,7 @@ public class Natives : BaseGenerator
         }
     }
 
-    private List<string> BuildCallArgs(List<(string type, string name)> nativeParams)
+    private static List<string> BuildCallArgs(List<(string type, string name)> nativeParams)
     {
         var args = new List<string>();
         foreach (var (type, name) in nativeParams)
@@ -403,7 +403,7 @@ public class Natives : BaseGenerator
         return args;
     }
 
-    private List<(string type, string name)> ParseParameters(string paramsRaw)
+    private static List<(string type, string name)> ParseParameters(string paramsRaw)
     {
         var result = new List<(string, string)>();
         if (string.IsNullOrWhiteSpace(paramsRaw) || paramsRaw == "void")

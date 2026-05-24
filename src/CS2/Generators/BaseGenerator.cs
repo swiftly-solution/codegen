@@ -15,9 +15,9 @@ public class GeneratorResult
 /// </summary>
 public class GeneratorProgress
 {
-    private readonly List<string> _history = new();
+    private readonly List<string> _history = [];
     private string _currentStatus = "Initializing...";
-    private readonly object _lock = new();
+    private readonly Lock _lock = new();
 
     public IReadOnlyList<string> History
     {

@@ -17,7 +17,7 @@ public static class GeneratorOptions
         { "Protobufs", (_, _, protobufsPath, _, _, _) => new Protobufs(protobufsPath) },
         { "Datamaps", (_, _, _, datamapsPath, _, _) => new Datamaps(datamapsPath!) },
         { "Schemas", (_, _, _, _, schemaPath, _) => new SchemaGenerator(schemaPath!) },
-        // { "Steamworks", (_, _, _, _, _, steamworksPath) => new SteamworksGenerator(steamworksPath) }
+        { "Steamworks", (_, _, _, _, _, steamworksPath) => new SteamworksGenerator(steamworksPath) }
     };
 
     public static async Task ShowGeneratorOptionsAsync(string? nativesPath, string? gameEventsPath, string? protobufsPath = null, string? datamapsPath = null, string? schemaPath = null, string? steamworksPath = null)

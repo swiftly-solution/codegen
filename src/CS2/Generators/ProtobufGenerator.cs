@@ -9,16 +9,15 @@ namespace SwiftlyS2.Codegen.CS2.Generators;
 public class Protobufs : BaseGenerator
 {
     private readonly string _protobufsPath;
-    private readonly List<string> _allEnumNames = new();
-    private readonly HashSet<string> _explicitProtoFiles = new();
+    private readonly List<string> _allEnumNames = [];
+    private readonly HashSet<string> _explicitProtoFiles = [];
     private FileDescriptorSet? _fileSet;
 
     /// <summary>
     /// Types to skip during generation. Add any message names here that you don't want generated.
     /// This is useful for excluding Google protobuf descriptor types and other unwanted messages.
     /// </summary>
-    private static readonly HashSet<string> SkipTypes = new()
-    {
+    private static readonly HashSet<string> SkipTypes = [
         "FileDescriptorSet",
         "FileDescriptorProto",
         "DescriptorProto",
@@ -56,7 +55,7 @@ public class Protobufs : BaseGenerator
         "BoolValue",
         "StringValue",
         "BytesValue",
-    };
+    ];
 
     private static readonly Dictionary<string, (string Prefix, string MessagePrefix)> NetMessageEnums = new()
     {
@@ -313,7 +312,7 @@ public class Protobufs : BaseGenerator
         }
     }
 
-    private void WriteEnum(EnumDescriptorProto enumProto, string outEnums, string prefix)
+    private static void WriteEnum(EnumDescriptorProto enumProto, string outEnums, string prefix)
     {
         var enumName = prefix + enumProto.Name;
         var writer = new CodeWriter();
@@ -367,7 +366,7 @@ public class Protobufs : BaseGenerator
         File.WriteAllText(Path.Combine(outInterfaces, $"{interfaceName}.cs"), interfaceWriter.ToString());
     }
 
-    private void WriteImplClass(CodeWriter writer, string className, string interfaceName, List<string> fields, int messageId)
+    private static void WriteImplClass(CodeWriter writer, string className, string interfaceName, List<string> fields, int messageId)
     {
         writer.AddLine("using SwiftlyS2.Core.Natives;");
         writer.AddLine("using SwiftlyS2.Core.NetMessages;");
@@ -391,7 +390,7 @@ public class Protobufs : BaseGenerator
         });
     }
 
-    private void WriteInterface(CodeWriter writer, string interfaceName, List<string> fields, int messageId)
+    private static void WriteInterface(CodeWriter writer, string interfaceName, List<string> fields, int messageId)
     {
         writer.AddLine("using SwiftlyS2.Core.ProtobufDefinitions;");
         writer.AddLine("using SwiftlyS2.Shared.Natives;");

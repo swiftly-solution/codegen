@@ -6,17 +6,12 @@ namespace SwiftlyS2.Codegen.CS2.Generators;
 /// <summary>
 /// Generator for datamaps
 /// </summary>
-public class Datamaps : BaseGenerator
+public class Datamaps(string datamapsPath) : BaseGenerator
 {
-    private readonly string _datamapsPath;
+    private readonly string _datamapsPath = datamapsPath;
 
     public override string Name => "Datamaps";
     public override string OutputPath => Path.Combine("output", "src", "SwiftlyS2.Generated", "Datamaps");
-
-    public Datamaps(string datamapsPath)
-    {
-        _datamapsPath = datamapsPath;
-    }
 
     public override async Task<GeneratorResult> GenerateFilesAsync()
     {
@@ -129,7 +124,7 @@ public class Datamaps : BaseGenerator
 
     #region Code Generation Methods
 
-    private void WriteManager(CodeWriter writer, List<string> managerFunctions, List<string> managerConstructors)
+    private static void WriteManager(CodeWriter writer, List<string> managerFunctions, List<string> managerConstructors)
     {
         writer.AddLine("using SwiftlyS2.Shared.SchemaDefinitions;");
         writer.AddLine("using SwiftlyS2.Core.Hooks;");
@@ -158,7 +153,7 @@ public class Datamaps : BaseGenerator
         });
     }
 
-    private void WriteService(CodeWriter writer, List<string> serviceFunctions)
+    private static void WriteService(CodeWriter writer, List<string> serviceFunctions)
     {
         writer.AddLine("using SwiftlyS2.Shared.Datamaps;");
         writer.AddLine("using SwiftlyS2.Shared.SchemaDefinitions;");
@@ -174,7 +169,7 @@ public class Datamaps : BaseGenerator
         });
     }
 
-    private void WriteServiceInterface(CodeWriter writer, List<string> serviceInterfaceFunctions)
+    private static void WriteServiceInterface(CodeWriter writer, List<string> serviceInterfaceFunctions)
     {
         writer.AddLine("using SwiftlyS2.Shared.Datamaps;");
         writer.AddLine("using SwiftlyS2.Shared.SchemaDefinitions;");
@@ -190,7 +185,7 @@ public class Datamaps : BaseGenerator
         });
     }
 
-    private void WriteHookContext(CodeWriter writer, string className, string functionName)
+    private static void WriteHookContext(CodeWriter writer, string className, string functionName)
     {
         writer.AddLine("using SwiftlyS2.Shared.Datamaps;");
         writer.AddLine("using SwiftlyS2.Shared.SchemaDefinitions;");
@@ -202,7 +197,7 @@ public class Datamaps : BaseGenerator
         });
     }
 
-    private void WriteHookContextInterface(CodeWriter writer, string className, string functionName)
+    private static void WriteHookContextInterface(CodeWriter writer, string className, string functionName)
     {
         writer.AddLine("using SwiftlyS2.Shared.SchemaDefinitions;");
         writer.AddLine();
