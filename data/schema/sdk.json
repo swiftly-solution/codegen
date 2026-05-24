@@ -2782,32 +2782,12 @@
                 {
                     "alignment": 255,
                     "kind": "ref",
-                    "name": "m_stutterStepStartTick",
-                    "name_hash": 7055172760344357733,
+                    "name": "m_plantAndTurnStartTick",
+                    "name_hash": 7055172759195931225,
                     "networked": false,
                     "offset": 40,
                     "size": 4,
                     "type": "GameTick_t"
-                },
-                {
-                    "alignment": 255,
-                    "kind": "ref",
-                    "name": "m_plantAndTurnStartTick",
-                    "name_hash": 7055172759195931225,
-                    "networked": false,
-                    "offset": 44,
-                    "size": 4,
-                    "type": "GameTick_t"
-                },
-                {
-                    "alignment": 1,
-                    "kind": "ref",
-                    "name": "m_bIsStutterStep",
-                    "name_hash": 7055172758221160436,
-                    "networked": false,
-                    "offset": 48,
-                    "size": 1,
-                    "type": "bool"
                 },
                 {
                     "alignment": 4,
@@ -2815,7 +2795,7 @@
                     "name": "m_flTurnOnSpotAngle",
                     "name_hash": 7055172756788893808,
                     "networked": false,
-                    "offset": 52,
+                    "offset": 44,
                     "size": 4,
                     "type": "float32"
                 },
@@ -2825,7 +2805,7 @@
                     "name": "m_flPreviousAimYaw",
                     "name_hash": 7055172757529861010,
                     "networked": false,
-                    "offset": 56,
+                    "offset": 48,
                     "size": 4,
                     "type": "float32"
                 },
@@ -2835,7 +2815,7 @@
                     "name": "m_flPreviousHorizontalSpeed",
                     "name_hash": 7055172757408827297,
                     "networked": false,
-                    "offset": 60,
+                    "offset": 52,
                     "size": 4,
                     "type": "float32"
                 },
@@ -2845,7 +2825,7 @@
                     "name": "m_flFootIKOffsetLeft",
                     "name_hash": 7055172757329911313,
                     "networked": false,
-                    "offset": 64,
+                    "offset": 56,
                     "size": 4,
                     "type": "float32"
                 },
@@ -2855,7 +2835,7 @@
                     "name": "m_flFootIKOffsetRight",
                     "name_hash": 7055172756640496434,
                     "networked": false,
-                    "offset": 68,
+                    "offset": 60,
                     "size": 4,
                     "type": "float32"
                 },
@@ -2865,7 +2845,7 @@
                     "name": "m_flWeaponDropPercentageDueToMovement",
                     "name_hash": 7055172759693393776,
                     "networked": false,
-                    "offset": 72,
+                    "offset": 64,
                     "size": 4,
                     "type": "float32"
                 },
@@ -2875,18 +2855,18 @@
                     "name": "m_flWeaponDropSmoothDampVelocity",
                     "name_hash": 7055172756769955729,
                     "networked": false,
-                    "offset": 76,
+                    "offset": 68,
                     "size": 4,
                     "type": "float32"
                 }
             ],
-            "fields_count": 18,
+            "fields_count": 16,
             "has_chainer": false,
             "is_struct": true,
             "name": "CCSPlayerAnimationState",
             "name_hash": 1642660414,
             "project": "server",
-            "size": 240
+            "size": 224
         },
         {
             "alignment": 8,
@@ -126860,24 +126840,10 @@
                 {
                     "alignment": 8,
                     "kind": "atomic",
-                    "name": "m_bIsStutterStep",
-                    "name_hash": 8172361552264495092,
-                    "networked": false,
-                    "offset": 1632,
-                    "size": 24,
-                    "template": [
-                        "bool"
-                    ],
-                    "templated": "CAnimGraph2ParamOptionalRef< bool >",
-                    "type": "CAnimGraph2ParamOptionalRef"
-                },
-                {
-                    "alignment": 8,
-                    "kind": "atomic",
                     "name": "m_flWeaponDropAmount",
                     "name_hash": 8172361554377735562,
                     "networked": false,
-                    "offset": 1656,
+                    "offset": 1632,
                     "size": 24,
                     "template": [
                         "float32"
@@ -126891,7 +126857,7 @@
                     "name": "m_groundAction",
                     "name_hash": 8172361552441388692,
                     "networked": false,
-                    "offset": 1680,
+                    "offset": 1656,
                     "size": 24,
                     "template": [
                         "CGlobalSymbol"
@@ -126905,7 +126871,7 @@
                     "name": "m_groundActionDirectionID",
                     "name_hash": 8172361554348273232,
                     "networked": false,
-                    "offset": 1704,
+                    "offset": 1680,
                     "size": 24,
                     "template": [
                         "CGlobalSymbol"
@@ -126919,7 +126885,7 @@
                     "name": "m_flGroundTurnAngleOrVelocity",
                     "name_hash": 8172361553498386604,
                     "networked": false,
-                    "offset": 1728,
+                    "offset": 1704,
                     "size": 24,
                     "template": [
                         "float32"
@@ -126933,7 +126899,7 @@
                     "name": "m_flLadderCycle",
                     "name_hash": 8172361553877349527,
                     "networked": false,
-                    "offset": 1752,
+                    "offset": 1728,
                     "size": 24,
                     "template": [
                         "float32"
@@ -126947,7 +126913,7 @@
                     "name": "m_flLadderYaw",
                     "name_hash": 8172361551609692210,
                     "networked": false,
-                    "offset": 1776,
+                    "offset": 1752,
                     "size": 24,
                     "template": [
                         "float32"
@@ -126961,7 +126927,7 @@
                     "name": "m_flLadderYawBackwards",
                     "name_hash": 8172361553350971428,
                     "networked": false,
-                    "offset": 1800,
+                    "offset": 1776,
                     "size": 24,
                     "template": [
                         "float32"
@@ -126975,7 +126941,7 @@
                     "name": "m_airAction",
                     "name_hash": 8172361554769458893,
                     "networked": false,
-                    "offset": 1824,
+                    "offset": 1800,
                     "size": 24,
                     "template": [
                         "CGlobalSymbol"
@@ -126989,7 +126955,7 @@
                     "name": "m_flAirHeightAboveGround",
                     "name_hash": 8172361554351696488,
                     "networked": false,
-                    "offset": 1848,
+                    "offset": 1824,
                     "size": 24,
                     "template": [
                         "float32"
@@ -127003,7 +126969,7 @@
                     "name": "m_leftFootTarget",
                     "name_hash": 8172361553651336253,
                     "networked": false,
-                    "offset": 1872,
+                    "offset": 1848,
                     "size": 24,
                     "template": [
                         "CNmTarget"
@@ -127017,7 +126983,7 @@
                     "name": "m_rightFootTarget",
                     "name_hash": 8172361551592426028,
                     "networked": false,
-                    "offset": 1896,
+                    "offset": 1872,
                     "size": 24,
                     "template": [
                         "CNmTarget"
@@ -127031,7 +126997,7 @@
                     "name": "m_flFlashedAmount",
                     "name_hash": 8172361551881358274,
                     "networked": false,
-                    "offset": 1920,
+                    "offset": 1896,
                     "size": 24,
                     "template": [
                         "float32"
@@ -127045,7 +127011,7 @@
                     "name": "m_flAimPitchAngle",
                     "name_hash": 8172361553159740865,
                     "networked": false,
-                    "offset": 1944,
+                    "offset": 1920,
                     "size": 24,
                     "template": [
                         "float32"
@@ -127059,7 +127025,7 @@
                     "name": "m_flAimYawAngle",
                     "name_hash": 8172361553328066846,
                     "networked": false,
-                    "offset": 1968,
+                    "offset": 1944,
                     "size": 24,
                     "template": [
                         "float32"
@@ -127073,7 +127039,7 @@
                     "name": "m_flinchHead",
                     "name_hash": 8172361550729873853,
                     "networked": false,
-                    "offset": 1992,
+                    "offset": 1968,
                     "size": 24,
                     "template": [
                         "CGlobalSymbol"
@@ -127087,7 +127053,7 @@
                     "name": "m_flinchHeadRestart",
                     "name_hash": 8172361553904856948,
                     "networked": false,
-                    "offset": 2016,
+                    "offset": 1992,
                     "size": 24,
                     "template": [
                         "bool"
@@ -127101,7 +127067,7 @@
                     "name": "m_flinchBody",
                     "name_hash": 8172361554806977503,
                     "networked": false,
-                    "offset": 2040,
+                    "offset": 2016,
                     "size": 24,
                     "template": [
                         "CGlobalSymbol"
@@ -127115,7 +127081,7 @@
                     "name": "m_flinchBodyRestart",
                     "name_hash": 8172361550912605814,
                     "networked": false,
-                    "offset": 2064,
+                    "offset": 2040,
                     "size": 24,
                     "template": [
                         "bool"
@@ -127129,7 +127095,7 @@
                     "name": "m_flinchIsOnFire",
                     "name_hash": 8172361551053104618,
                     "networked": false,
-                    "offset": 2088,
+                    "offset": 2064,
                     "size": 24,
                     "template": [
                         "bool"
@@ -127138,13 +127104,13 @@
                     "type": "CAnimGraph2ParamOptionalRef"
                 }
             ],
-            "fields_count": 29,
+            "fields_count": 28,
             "has_chainer": false,
             "is_struct": false,
             "name": "CCS2PawnGraphController",
             "name_hash": 1902776200,
             "project": "server",
-            "size": 2112
+            "size": 2088
         },
         {
             "alignment": 255,
@@ -144055,7 +144021,7 @@
                     "name_hash": 15135923261218264286,
                     "networked": false,
                     "offset": 736,
-                    "size": 240,
+                    "size": 224,
                     "type": "CCSPlayerAnimationState"
                 },
                 {
@@ -144064,7 +144030,7 @@
                     "name": "m_vecLadderNormal",
                     "name_hash": 15135923260487879414,
                     "networked": false,
-                    "offset": 976,
+                    "offset": 960,
                     "size": 12,
                     "templated": "Vector",
                     "type": "Vector"
@@ -144075,7 +144041,7 @@
                     "name": "m_nLadderSurfacePropIndex",
                     "name_hash": 15135923260683493899,
                     "networked": true,
-                    "offset": 988,
+                    "offset": 972,
                     "size": 4,
                     "type": "int32"
                 },
@@ -144085,7 +144051,7 @@
                     "name": "m_bDucked",
                     "name_hash": 15135923260683737689,
                     "networked": true,
-                    "offset": 992,
+                    "offset": 976,
                     "size": 1,
                     "type": "bool"
                 },
@@ -144095,7 +144061,7 @@
                     "name": "m_flDuckAmount",
                     "name_hash": 15135923264179106830,
                     "networked": true,
-                    "offset": 996,
+                    "offset": 980,
                     "size": 4,
                     "type": "float32"
                 },
@@ -144105,7 +144071,7 @@
                     "name": "m_flDuckSpeed",
                     "name_hash": 15135923263166817141,
                     "networked": true,
-                    "offset": 1000,
+                    "offset": 984,
                     "size": 4,
                     "type": "float32"
                 },
@@ -144115,7 +144081,7 @@
                     "name": "m_bDuckOverride",
                     "name_hash": 15135923263510590184,
                     "networked": true,
-                    "offset": 1004,
+                    "offset": 988,
                     "size": 1,
                     "type": "bool"
                 },
@@ -144125,7 +144091,7 @@
                     "name": "m_bDesiresDuck",
                     "name_hash": 15135923263089362745,
                     "networked": true,
-                    "offset": 1005,
+                    "offset": 989,
                     "size": 1,
                     "type": "bool"
                 },
@@ -144135,7 +144101,7 @@
                     "name": "m_bDucking",
                     "name_hash": 15135923262671950192,
                     "networked": true,
-                    "offset": 1006,
+                    "offset": 990,
                     "size": 1,
                     "type": "bool"
                 },
@@ -144145,7 +144111,7 @@
                     "name": "m_flDuckRootOffset",
                     "name_hash": 15135923263043433969,
                     "networked": true,
-                    "offset": 1008,
+                    "offset": 992,
                     "size": 4,
                     "type": "float32"
                 },
@@ -144155,7 +144121,7 @@
                     "name": "m_flDuckViewOffset",
                     "name_hash": 15135923262418185928,
                     "networked": true,
-                    "offset": 1012,
+                    "offset": 996,
                     "size": 4,
                     "type": "float32"
                 },
@@ -144165,7 +144131,7 @@
                     "name": "m_flLastDuckTime",
                     "name_hash": 15135923262740507203,
                     "networked": true,
-                    "offset": 1016,
+                    "offset": 1000,
                     "size": 4,
                     "type": "float32"
                 },
@@ -144175,7 +144141,7 @@
                     "name": "m_flBombPlantViewOffset",
                     "name_hash": 15135923262482105514,
                     "networked": true,
-                    "offset": 1020,
+                    "offset": 1004,
                     "size": 4,
                     "type": "float32"
                 },
@@ -144185,7 +144151,7 @@
                     "name": "m_vecLastPositionAtFullCrouchSpeed",
                     "name_hash": 15135923262926422743,
                     "networked": false,
-                    "offset": 1032,
+                    "offset": 1016,
                     "size": 8,
                     "templated": "Vector2D",
                     "type": "Vector2D"
@@ -144196,7 +144162,7 @@
                     "name": "m_duckUntilOnGround",
                     "name_hash": 15135923264153317962,
                     "networked": false,
-                    "offset": 1040,
+                    "offset": 1024,
                     "size": 1,
                     "type": "bool"
                 },
@@ -144206,7 +144172,7 @@
                     "name": "m_bHasWalkMovedSinceLastJump",
                     "name_hash": 15135923263958850913,
                     "networked": false,
-                    "offset": 1041,
+                    "offset": 1025,
                     "size": 1,
                     "type": "bool"
                 },
@@ -144216,7 +144182,7 @@
                     "name": "m_bInStuckTest",
                     "name_hash": 15135923264582875498,
                     "networked": false,
-                    "offset": 1042,
+                    "offset": 1026,
                     "size": 1,
                     "type": "bool"
                 },
@@ -144226,7 +144192,7 @@
                     "name": "m_nTraceCount",
                     "name_hash": 15135923261692238953,
                     "networked": false,
-                    "offset": 1568,
+                    "offset": 1552,
                     "size": 4,
                     "type": "int32"
                 },
@@ -144236,7 +144202,7 @@
                     "name": "m_StuckLast",
                     "name_hash": 15135923263937153275,
                     "networked": false,
-                    "offset": 1572,
+                    "offset": 1556,
                     "size": 4,
                     "type": "int32"
                 },
@@ -144246,7 +144212,7 @@
                     "name": "m_bSpeedCropped",
                     "name_hash": 15135923264127231131,
                     "networked": false,
-                    "offset": 1576,
+                    "offset": 1560,
                     "size": 1,
                     "type": "bool"
                 },
@@ -144256,7 +144222,7 @@
                     "name": "m_nOldWaterLevel",
                     "name_hash": 15135923263310754821,
                     "networked": false,
-                    "offset": 1580,
+                    "offset": 1564,
                     "size": 4,
                     "type": "int32"
                 },
@@ -144266,7 +144232,7 @@
                     "name": "m_flWaterEntryTime",
                     "name_hash": 15135923261699933439,
                     "networked": false,
-                    "offset": 1584,
+                    "offset": 1568,
                     "size": 4,
                     "type": "float32"
                 },
@@ -144276,7 +144242,7 @@
                     "name": "m_vecForward",
                     "name_hash": 15135923261885424378,
                     "networked": false,
-                    "offset": 1588,
+                    "offset": 1572,
                     "size": 12,
                     "templated": "Vector",
                     "type": "Vector"
@@ -144287,7 +144253,7 @@
                     "name": "m_vecLeft",
                     "name_hash": 15135923263716573648,
                     "networked": false,
-                    "offset": 1600,
+                    "offset": 1584,
                     "size": 12,
                     "templated": "Vector",
                     "type": "Vector"
@@ -144298,7 +144264,7 @@
                     "name": "m_vecUp",
                     "name_hash": 15135923262897103488,
                     "networked": false,
-                    "offset": 1612,
+                    "offset": 1596,
                     "size": 12,
                     "templated": "Vector",
                     "type": "Vector"
@@ -144309,7 +144275,7 @@
                     "name": "m_nGameCodeHasMovedPlayerAfterCommand",
                     "name_hash": 15135923260879091727,
                     "networked": true,
-                    "offset": 1624,
+                    "offset": 1608,
                     "size": 4,
                     "type": "int32"
                 },
@@ -144319,7 +144285,7 @@
                     "name": "m_bMadeFootstepNoise",
                     "name_hash": 15135923263207731816,
                     "networked": false,
-                    "offset": 1628,
+                    "offset": 1612,
                     "size": 1,
                     "type": "bool"
                 },
@@ -144329,7 +144295,7 @@
                     "name": "m_iFootsteps",
                     "name_hash": 15135923260646106395,
                     "networked": false,
-                    "offset": 1632,
+                    "offset": 1616,
                     "size": 4,
                     "type": "int32"
                 },
@@ -144339,7 +144305,7 @@
                     "name": "m_fStashGrenadeParameterWhen",
                     "name_hash": 15135923264577413263,
                     "networked": true,
-                    "offset": 1636,
+                    "offset": 1620,
                     "size": 4,
                     "type": "GameTime_t"
                 },
@@ -144349,7 +144315,7 @@
                     "name": "m_nButtonDownMaskPrev",
                     "name_hash": 15135923264537140676,
                     "networked": true,
-                    "offset": 1640,
+                    "offset": 1624,
                     "size": 8,
                     "type": "uint64"
                 },
@@ -144359,7 +144325,7 @@
                     "name": "m_bUseFrictionStashedSpeed",
                     "name_hash": 15135923261349286245,
                     "networked": true,
-                    "offset": 1648,
+                    "offset": 1632,
                     "size": 1,
                     "type": "bool"
                 },
@@ -144369,7 +144335,7 @@
                     "name": "m_flUseFrictionStashedSpeedUntilFrac",
                     "name_hash": 15135923263147566589,
                     "networked": true,
-                    "offset": 1652,
+                    "offset": 1636,
                     "size": 4,
                     "type": "float32"
                 },
@@ -144379,7 +144345,7 @@
                     "name": "m_flFrictionStashedSpeed",
                     "name_hash": 15135923262928456410,
                     "networked": true,
-                    "offset": 1656,
+                    "offset": 1640,
                     "size": 4,
                     "type": "float32"
                 },
@@ -144389,7 +144355,7 @@
                     "name": "m_flStamina",
                     "name_hash": 15135923264338156684,
                     "networked": true,
-                    "offset": 1660,
+                    "offset": 1644,
                     "size": 4,
                     "type": "float32"
                 },
@@ -144399,7 +144365,7 @@
                     "name": "m_flHeightAtJumpStart",
                     "name_hash": 15135923264060961959,
                     "networked": false,
-                    "offset": 1664,
+                    "offset": 1648,
                     "size": 4,
                     "type": "float32"
                 },
@@ -144409,7 +144375,7 @@
                     "name": "m_flMaxJumpHeightThisJump",
                     "name_hash": 15135923263648468580,
                     "networked": false,
-                    "offset": 1668,
+                    "offset": 1652,
                     "size": 4,
                     "type": "float32"
                 },
@@ -144419,7 +144385,7 @@
                     "name": "m_flMaxJumpHeightLastJump",
                     "name_hash": 15135923262634840024,
                     "networked": false,
-                    "offset": 1672,
+                    "offset": 1656,
                     "size": 4,
                     "type": "float32"
                 },
@@ -144429,7 +144395,7 @@
                     "name": "m_flStaminaAtJumpStart",
                     "name_hash": 15135923263625871843,
                     "networked": false,
-                    "offset": 1676,
+                    "offset": 1660,
                     "size": 4,
                     "type": "float32"
                 },
@@ -144439,7 +144405,7 @@
                     "name": "m_flVelMulAtJumpStart",
                     "name_hash": 15135923263432291795,
                     "networked": false,
-                    "offset": 1680,
+                    "offset": 1664,
                     "size": 4,
                     "type": "float32"
                 },
@@ -144449,7 +144415,7 @@
                     "name": "m_flAccumulatedJumpError",
                     "name_hash": 15135923260992040063,
                     "networked": false,
-                    "offset": 1684,
+                    "offset": 1668,
                     "size": 4,
                     "type": "float32"
                 },
@@ -144459,7 +144425,7 @@
                     "name": "m_LegacyJump",
                     "name_hash": 15135923261166852710,
                     "networked": true,
-                    "offset": 1688,
+                    "offset": 1672,
                     "size": 24,
                     "type": "CCSPlayerLegacyJump"
                 },
@@ -144469,7 +144435,7 @@
                     "name": "m_ModernJump",
                     "name_hash": 15135923261766619426,
                     "networked": true,
-                    "offset": 1712,
+                    "offset": 1696,
                     "size": 56,
                     "type": "CCSPlayerModernJump"
                 },
@@ -144479,7 +144445,7 @@
                     "name": "m_nLastJumpTick",
                     "name_hash": 15135923263336935020,
                     "networked": true,
-                    "offset": 1768,
+                    "offset": 1752,
                     "size": 4,
                     "type": "GameTick_t"
                 },
@@ -144489,7 +144455,7 @@
                     "name": "m_flLastJumpFrac",
                     "name_hash": 15135923261856551051,
                     "networked": true,
-                    "offset": 1772,
+                    "offset": 1756,
                     "size": 4,
                     "type": "float32"
                 },
@@ -144499,7 +144465,7 @@
                     "name": "m_flLastJumpVelocityZ",
                     "name_hash": 15135923260727144450,
                     "networked": true,
-                    "offset": 1776,
+                    "offset": 1760,
                     "size": 4,
                     "type": "float32"
                 },
@@ -144509,7 +144475,7 @@
                     "name": "m_bJumpApexPending",
                     "name_hash": 15135923263330754384,
                     "networked": true,
-                    "offset": 1780,
+                    "offset": 1764,
                     "size": 1,
                     "type": "bool"
                 },
@@ -144519,7 +144485,7 @@
                     "name": "m_flTicksSinceLastSurfingDetected",
                     "name_hash": 15135923261186133279,
                     "networked": false,
-                    "offset": 1784,
+                    "offset": 1768,
                     "size": 4,
                     "type": "float32"
                 },
@@ -144529,7 +144495,7 @@
                     "name": "m_bWasSurfing",
                     "name_hash": 15135923263609373166,
                     "networked": true,
-                    "offset": 1788,
+                    "offset": 1772,
                     "size": 1,
                     "type": "bool"
                 },
@@ -144539,7 +144505,7 @@
                     "name": "m_vecWalkWishVel",
                     "name_hash": 15135923260599377786,
                     "networked": false,
-                    "offset": 1932,
+                    "offset": 1916,
                     "size": 8,
                     "templated": "Vector2D",
                     "type": "Vector2D"
@@ -144550,7 +144516,7 @@
                     "name": "m_gtLastTimeOnStaticWorldGround",
                     "name_hash": 15135923264319030091,
                     "networked": true,
-                    "offset": 4024,
+                    "offset": 4008,
                     "size": 4,
                     "type": "GameTime_t"
                 },
@@ -144560,7 +144526,7 @@
                     "name": "m_gtLastTimeInAir",
                     "name_hash": 15135923263263930012,
                     "networked": true,
-                    "offset": 4028,
+                    "offset": 4012,
                     "size": 4,
                     "type": "GameTime_t"
                 },
@@ -144570,7 +144536,7 @@
                     "name": "m_bHasEverProcessedCommand",
                     "name_hash": 15135923262406142110,
                     "networked": true,
-                    "offset": 4032,
+                    "offset": 4016,
                     "size": 1,
                     "type": "bool"
                 }
@@ -144581,7 +144547,7 @@
             "name": "CCSPlayer_MovementServices",
             "name_hash": 3524106755,
             "project": "server",
-            "size": 4048
+            "size": 4032
         },
         {
             "alignment": 16,
@@ -163246,6 +163212,16 @@
                     "type": "bool"
                 },
                 {
+                    "alignment": 1,
+                    "kind": "ref",
+                    "name": "m_bGPUCullSkybox",
+                    "name_hash": 7239427552039032627,
+                    "networked": false,
+                    "offset": 1218,
+                    "size": 1,
+                    "type": "bool"
+                },
+                {
                     "alignment": 4,
                     "kind": "ref",
                     "name": "m_flEnvRainStrength",
@@ -163296,7 +163272,7 @@
                     "type": "float32"
                 }
             ],
-            "fields_count": 14,
+            "fields_count": 15,
             "has_chainer": false,
             "is_struct": false,
             "name": "CMapInfo",
