@@ -175,27 +175,27 @@ public static class GeneratorOptions
 
         if (selectedGenerators.Contains("Steamworks") && string.IsNullOrEmpty(steamworksPath))
         {
-            AnsiConsole.MarkupLine("[yellow]Please browse for steam_api.json file:[/]");
+            AnsiConsole.MarkupLine("[yellow]Please browse for folder with steam headers api:[/]");
 
             while (string.IsNullOrEmpty(steamworksPath))
             {
-                var selectedPath = Entrypoint.BrowseForFile("Browse for steam_api.json", Entrypoint.ProjectRootPath, ".json");
+                var selectedPath = Entrypoint.BrowseForDirectory("Browse for Steam API Folder", Entrypoint.ProjectRootPath);
 
-                if (Path.GetFileName(selectedPath).Equals("steam_api.json", StringComparison.OrdinalIgnoreCase))
+                if (Directory.Exists(selectedPath))
                 {
                     steamworksPath = selectedPath;
                     break;
                 }
 
-                AnsiConsole.MarkupLine($"[red]Selected file is not steam_api.json:[/] {selectedPath}");
-                var useSelectedFile = AnsiConsole.Confirm("Use this file anyway?", false);
+                AnsiConsole.MarkupLine($"[red]Selected path is not a valid Steam API folder:[/] {selectedPath}");
+                var useSelectedFile = AnsiConsole.Confirm("Use this folder anyway?", false);
                 if (useSelectedFile)
                 {
                     steamworksPath = selectedPath;
                 }
             }
 
-            AnsiConsole.MarkupLine($"[green]Selected steam_api.json path:[/] {steamworksPath}");
+            AnsiConsole.MarkupLine($"[green]Selected Steam API path:[/] {steamworksPath}");
         }
 
         AnsiConsole.WriteLine();

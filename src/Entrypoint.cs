@@ -121,12 +121,12 @@ public static class Entrypoint
         AnsiConsole.MarkupLine("  -p, --protobufs-path <path>    Path to the protobufs folder");
         AnsiConsole.MarkupLine("  -d, --datamaps-path <path>     Path to the datamaps.json file");
         AnsiConsole.MarkupLine("  -schema, --schema-path <path>  Path to the schema folder");
-        AnsiConsole.MarkupLine("  -s, --steamworks-path <path>   Path to the steam_api.json file");
+        AnsiConsole.MarkupLine("  -s, --steamworks-path <path>   Path to the steam api folder");
         AnsiConsole.MarkupLine("  -h, --help                     Show this help message");
         AnsiConsole.WriteLine();
         AnsiConsole.MarkupLine("[bold]Examples:[/]");
         AnsiConsole.MarkupLine("  SwiftlyS2.Codegen --natives-path C:\\path\\to\\natives");
-        AnsiConsole.MarkupLine("  SwiftlyS2.Codegen -n C:\\path\\to\\natives -g C:\\path\\to\\gameevents -s C:\\path\\to\\steam_api.json");
+        AnsiConsole.MarkupLine("  SwiftlyS2.Codegen -n C:\\path\\to\\natives -g C:\\path\\to\\gameevents -s C:\\path\\to\\steam\\folder");
     }
 
     public static string BrowseForDirectory(string title, string? defaultPath = null)
