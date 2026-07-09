@@ -5,10 +5,6 @@
             "designer_name": "func_nav_avoidance_obstacle"
         },
         {
-            "class_name": "CScriptNavBlocker",
-            "designer_name": "script_nav_blocker"
-        },
-        {
             "class_name": "CEconWearable",
             "designer_name": "wearable_item"
         },
@@ -55,10 +51,6 @@
         {
             "class_name": "CTriggerSave",
             "designer_name": "trigger_autosave"
-        },
-        {
-            "class_name": "CTriggerToggleSave",
-            "designer_name": "trigger_togglesave"
         },
         {
             "class_name": "CInfoTeleportDestination",
@@ -469,6 +461,14 @@
             "designer_name": "logic_gameevent_listener"
         },
         {
+            "class_name": "CLogicGameStateReport",
+            "designer_name": "logic_gamestate_report"
+        },
+        {
+            "class_name": "CLogicActivityEvent",
+            "designer_name": "logic_activityevent"
+        },
+        {
             "class_name": "CLogicAchievement",
             "designer_name": "logic_achievement"
         },
@@ -691,10 +691,6 @@
         {
             "class_name": "CEnvParticleGlow",
             "designer_name": "env_particle_glow"
-        },
-        {
-            "class_name": "CInfoInteraction",
-            "designer_name": "info_interaction"
         },
         {
             "class_name": "CPointGamestatsCounter",
@@ -1049,6 +1045,10 @@
             "designer_name": "team_select_terrorist"
         },
         {
+            "class_name": "CCSGO_TeamPreviewCharacterPosition",
+            "designer_name": "team_preview_character_position"
+        },
+        {
             "class_name": "CCSPetPlacement",
             "designer_name": "cs_pet_placement"
         },
@@ -1103,6 +1103,10 @@
         {
             "class_name": "CNavSpaceInfo",
             "designer_name": "info_nav_space"
+        },
+        {
+            "class_name": "CScriptNavBlocker",
+            "designer_name": "script_nav_blocker"
         },
         {
             "class_name": "CFuncNavBlocker",
@@ -1305,6 +1309,10 @@
             "designer_name": "path_mover"
         },
         {
+            "class_name": "CFuncMoverRouter",
+            "designer_name": "func_mover_router"
+        },
+        {
             "class_name": "CPathMoverEntitySpawner",
             "designer_name": "path_mover_entity_spawner"
         },
@@ -1435,6 +1443,10 @@
         {
             "class_name": "CSoundOpvarSetAABBEntity",
             "designer_name": "snd_opvar_set_aabb"
+        },
+        {
+            "class_name": "CSoundOpvarSetBoxEntity",
+            "designer_name": "snd_opvar_set_box_base"
         },
         {
             "class_name": "CSoundOpvarSetPointEntity",
@@ -1761,6 +1773,10 @@
             "designer_name": "point_script"
         },
         {
+            "class_name": "CCSPlayerPawnBase",
+            "designer_name": "player_pawn_base"
+        },
+        {
             "class_name": "CCSPlayerPawn",
             "designer_name": "player"
         },
@@ -1841,6 +1857,10 @@
             "designer_name": "func_useableladder"
         },
         {
+            "class_name": "CBaseAnimGraph",
+            "designer_name": "baseanimating"
+        },
+        {
             "class_name": "CPathParticleRope",
             "designer_name": "path_particle_rope_clientside"
         },
@@ -1875,6 +1895,10 @@
         {
             "class_name": "CTonemapController2",
             "designer_name": "env_tonemap_controller2"
+        },
+        {
+            "class_name": "CEnvCombinedLightProbeVolume",
+            "designer_name": "func_combined_light_probe_volume"
         },
         {
             "class_name": "CHostage",
