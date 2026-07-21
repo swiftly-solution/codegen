@@ -25,6 +25,7 @@
         "CStrongHandle": "CStrongHandle",
         "CUtlSymbolLarge": "CUtlSymbolLarge",
         "CUtlString": "CUtlString",
+        "CGameSoundEventName": "CGameSoundEventName",
         "Color": "Color",
         "CHandle": "CHandle",
         "CBufferString": "CBufferString",
@@ -51,11 +52,14 @@
         "CNetworkVarChainer": "CNetworkVarChainer",
         "HSCRIPT": "HSCRIPTHandler",
         "QuaternionStorage": "QuaternionStorage",
+        "Range_t": "Range_t",
+        "RnSphere_t": "RnSphere_t",
         "CEntityIOOutput": "CEntityIOOutput",
         "CVariantBase<CVariantDefaultAllocator>": "CVariant<CVariantDefaultAllocator>",
         "CAnimGraph2ParamOptionalRef<float32>": "CAnimGraph2ParamOptionalRefFloat",
         "CAnimGraph2ParamOptionalRef<bool>": "CAnimGraph2ParamOptionalRefBool",
-        "CAnimGraph2ParamOptionalRef<CGlobalSymbol>": "CAnimGraph2ParamOptionalRefCGlobalSymbol"
+        "CAnimGraph2ParamOptionalRef<CGlobalSymbol>": "CAnimGraph2ParamOptionalRefCGlobalSymbol",
+        "CTypedBitVec<64>": "CBitVec64"
     },
     "managedTypes": [
         "SchemaClass",
@@ -72,7 +76,6 @@
         "CUtlLeanVectorFixedGrowable",
         "CWeakHandle",
         "DegreeEuler",
-        "CTypedBitVec",
         "CUtlSymbol",
         "CUtlOrderedMap",
         "CUtlMap",
