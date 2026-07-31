@@ -68,24 +68,6 @@ public class SchemaGenerator : BaseGenerator
 
             Progress.Report($"Loaded Entity System with {entitySystemData!.EntityClasses.Count} entity classes.");
 
-            var customEntitySystemPath = Path.Combine(_schemasPath, "entitysystem_custom.json");
-            if (File.Exists(customEntitySystemPath))
-            {
-                var customEntitySystemContent = await File.ReadAllTextAsync(customEntitySystemPath);
-                var customEntitySystemData = JsonSerializer.Deserialize<EntitySystem>(customEntitySystemContent);
-
-                var existingClassNames = new HashSet<string>(entitySystemData.EntityClasses.Select(ec => ec.ClassName));
-                foreach (var customClass in customEntitySystemData!.EntityClasses)
-                {
-                    if (existingClassNames.Contains(customClass.ClassName))
-                    {
-                        entitySystemData.EntityClasses.RemoveAll(ec => ec.ClassName == customClass.ClassName);
-                    }
-                    entitySystemData.EntityClasses.Add(customClass);
-                }
-                Progress.Report($"Merged {customEntitySystemData.EntityClasses.Count} custom entity classes. Total: {entitySystemData.EntityClasses.Count}");
-            }
-
             var allClassNames = sdkData.Classes.Select(c => c.Name.Replace(":", "_")).ToList();
             var allEnumNames = sdkData.Enums.Select(e => e.Name.Replace(":", "_")).ToList();
 
@@ -162,6 +144,44 @@ public class SchemaGenerator : BaseGenerator
 
         WriteInterface(@class, entitySystemData, allClassNames, allEnumNames);
         WriteImplementation(@class, entitySystemData, allClassNames, allEnumNames);
+    }
+
+    private static void WriteCachedWrapper(CodeWriter writer, ProcessedFieldEntry field, string ctorArgs)
+    {
+        writer.RemoveLine();
+        writer.AddLine($"private {field.ImplementationType}? _{field.Name}Instance;");
+        writer.AddLine();
+
+        writer.AddBlock($"public {field.InterfaceType} {field.Name}", () =>
+        {
+            writer.AddBlock("get", () =>
+            {
+                writer.AddLine($"_{field.Name}Offset = _{field.Name}Offset ?? Schema.GetOffset({field.Hash});");
+                writer.AddLine($"var instance = _{field.Name}Instance ??= new {field.ImplementationType}({ctorArgs});");
+                writer.AddLine($"instance.DangerousSetHandle(_Handle + _{field.Name}Offset!.Value);");
+                writer.AddLine("return instance;");
+            });
+        });
+    }
+
+    private static void WriteCachedPointerWrapper(CodeWriter writer, ProcessedFieldEntry field)
+    {
+        writer.RemoveLine();
+        writer.AddLine($"private {field.ImplementationType}? _{field.Name}Instance;");
+        writer.AddLine();
+
+        writer.AddBlock($"public {field.InterfaceType}? {field.Name}", () =>
+        {
+            writer.AddBlock("get", () =>
+            {
+                writer.AddLine($"_{field.Name}Offset = _{field.Name}Offset ?? Schema.GetOffset({field.Hash});");
+                writer.AddLine($"var ptr = _Handle.Read<nint>(_{field.Name}Offset!.Value);");
+                writer.AddLine("if (!ptr.IsValidPtr()) return null;");
+                writer.AddLine($"var instance = _{field.Name}Instance ??= new {field.ImplementationType}(0);");
+                writer.AddLine("instance.DangerousSetHandle(ptr);");
+                writer.AddLine("return instance;");
+            });
+        });
     }
 
     private void WriteImplementation(Class @class, EntitySystem entitySystemData, List<string> allClassNames, List<string> allEnumNames)
@@ -247,13 +267,7 @@ public class SchemaGenerator : BaseGenerator
                             field.ImplementationType = "SchemaUtlStringFixedArray";
                             field.InterfaceType = "ISchemaUtlStringFixedArray";
 
-                            writer.RemoveLine();
-                            writer.RemoveLine();
-
-                            writer.AddBlock($"public {field.InterfaceType} {field.Name}", () =>
-                            {
-                                writer.AddLine($"get => new {field.ImplementationType}(_Handle, {field.Hash}, {field.ElementCount}, {field.ElementSize}, {field.ElementAlignment});");
-                            });
+                            WriteCachedWrapper(writer, field, $"0, {field.Hash}, {field.ElementCount}, {field.ElementSize}, {field.ElementAlignment}");
                         }
                         else
                         {
@@ -280,13 +294,7 @@ public class SchemaGenerator : BaseGenerator
                             field.ImplementationType = "SchemaStringFixedArray";
                             field.InterfaceType = "ISchemaStringFixedArray";
 
-                            writer.RemoveLine();
-                            writer.RemoveLine();
-
-                            writer.AddBlock($"public {field.InterfaceType} {field.Name}", () =>
-                            {
-                                writer.AddLine($"get => new {field.ImplementationType}(_Handle, {field.Hash}, {field.ElementCount}, {field.ElementSize}, {field.ElementAlignment});");
-                            });
+                            WriteCachedWrapper(writer, field, $"0, {field.Hash}, {field.ElementCount}, {field.ElementSize}, {field.ElementAlignment}");
                         }
                         else
                         {
@@ -308,13 +316,7 @@ public class SchemaGenerator : BaseGenerator
                     }
                     else if (field.Kind == "fixed_array" && field.ImplementationType != "SchemaUntypedField")
                     {
-                        writer.RemoveLine();
-                        writer.RemoveLine();
-
-                        writer.AddBlock($"public {field.InterfaceType} {field.Name}", () =>
-                        {
-                            writer.AddLine($"get => new {field.ImplementationType}(_Handle, {field.Hash}, {field.ElementCount}, {field.ElementSize}, {field.ElementAlignment});");
-                        });
+                        WriteCachedWrapper(writer, field, $"0, {field.Hash}, {field.ElementCount}, {field.ElementSize}, {field.ElementAlignment}");
                     }
                     else if (field.IsValueType)
                     {
@@ -331,26 +333,11 @@ public class SchemaGenerator : BaseGenerator
                     {
                         if (field.Kind == "ptr" && !FieldTypeParser.GetManagedTypes().Contains(field.ImplementationType))
                         {
-                            writer.AddBlock($"public {field.InterfaceType}? {field.Name}", () =>
-                            {
-                                writer.AddBlock("get", () =>
-                                {
-                                    writer.AddLine($"_{field.Name}Offset = _{field.Name}Offset ?? Schema.GetOffset({field.Hash});");
-                                    writer.AddLine($"var ptr = _Handle.Read<nint>(_{field.Name}Offset!.Value);");
-                                    writer.AddLine($"return ptr.IsValidPtr() ? new {field.ImplementationType}(ptr) : null;");
-                                });
-                            });
+                            WriteCachedPointerWrapper(writer, field);
                         }
                         else
                         {
-                            writer.AddBlock($"public {field.InterfaceType} {field.Name}", () =>
-                            {
-                                writer.AddBlock("get", () =>
-                                {
-                                    writer.AddLine($"_{field.Name}Offset = _{field.Name}Offset ?? Schema.GetOffset({field.Hash});");
-                                    writer.AddLine($"return new {field.ImplementationType}(_Handle + _{field.Name}Offset!.Value);");
-                                });
-                            });
+                            WriteCachedWrapper(writer, field, "0");
                         }
                     }
                 }
@@ -398,7 +385,7 @@ public class SchemaGenerator : BaseGenerator
         {
             writer.AddLine($"static {interfaceName} ISchemaClass<{interfaceName}>.From(nint handle) => new {implementationName}(handle);");
             writer.AddLine($"static int ISchemaClass<{interfaceName}>.Size => {@class.Size};");
-            writer.AddLine($"static string? ISchemaClass<{interfaceName}>.ClassName => {designerName};");
+            writer.AddLine($"static string? ISchemaClass<{interfaceName}>.ClassName => {(interfaceName == "CPropDoorRotating" ? "\"prop_door_rotating\"" : designerName)};");
             writer.AddLine();
             if (@class.FieldsCount > 0)
             {
