@@ -37,7 +37,7 @@ public static class Entrypoint
         bool gameEvents = false;
         string? protobufsPath = null;
         bool datamaps = false;
-        string? schemaPath = null;
+        bool schemas = false;
         string? steamworksPath = null;
         string? game = null;
 
@@ -66,10 +66,9 @@ public static class Entrypoint
             {
                 datamaps = true;
             }
-            else if ((args[i] == "--schema-path" || args[i] == "-schema") && i + 1 < args.Length)
+            else if (args[i] == "--schemas" || args[i] == "-schema")
             {
-                schemaPath = args[i + 1];
-                i++;
+                schemas = true;
             }
             else if ((args[i] == "--steamworks-path" || args[i] == "-s") && i + 1 < args.Length)
             {
@@ -98,7 +97,7 @@ public static class Entrypoint
         {
             case "Counter-Strike: 2":
             case "cs2":
-                await CS2.GeneratorOptions.ShowGeneratorOptionsAsync(nativesPath, gameEvents, protobufsPath, datamaps, schemaPath, steamworksPath);
+                await CS2.GeneratorOptions.ShowGeneratorOptionsAsync(nativesPath, gameEvents, protobufsPath, datamaps, schemas, steamworksPath);
                 break;
             default:
                 AnsiConsole.MarkupLine("[red]Error:[/] Unknown game selected.");
@@ -118,7 +117,7 @@ public static class Entrypoint
         AnsiConsole.MarkupLine("  -g, --gameevents               Generate game events (downloaded from CS2-Dumps)");
         AnsiConsole.MarkupLine("  -p, --protobufs-path <path>    Path to the protobufs folder");
         AnsiConsole.MarkupLine("  -d, --datamaps                 Generate datamaps (downloaded from CS2-Dumps)");
-        AnsiConsole.MarkupLine("  -schema, --schema-path <path>  Path to the schema folder");
+        AnsiConsole.MarkupLine("  -schema, --schemas             Generate schemas (downloaded from CS2-Dumps)");
         AnsiConsole.MarkupLine("  -s, --steamworks-path <path>   Path to the steam api folder");
         AnsiConsole.MarkupLine("  -h, --help                     Show this help message");
         AnsiConsole.WriteLine();

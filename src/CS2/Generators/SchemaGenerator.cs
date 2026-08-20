@@ -12,20 +12,15 @@ namespace SwiftlyS2.Codegen.CS2.Generators;
 /// </summary>
 public class SchemaGenerator : BaseGenerator
 {
+    private static readonly HttpClient httpClient = new();
+    private const string SdkUrl = "https://raw.githubusercontent.com/Swiftly-Tracker/CS2-Dumps/main/dump/sdk.json";
+    private const string EntitiesUrl = "https://raw.githubusercontent.com/Swiftly-Tracker/CS2-Dumps/main/dump/entities.json";
+
     /// <inheritdoc />
     public override string Name => "Schema";
 
     /// <inheritdoc />
     public override string OutputPath => Path.Combine(Entrypoint.ProjectRootPath, "output", "src", "SwiftlyS2.Generated", "Schemas");
-
-    private readonly string _schemasPath;
-
-    /// <inheritdoc />
-    public override string? DataPath
-    {
-        get => _schemasPath;
-        protected set { }
-    }
 
     private static readonly HashSet<string> ErasedGenerics = [
         "CUtlVector",
@@ -34,20 +29,11 @@ public class SchemaGenerator : BaseGenerator
         "CNetworkUtlVectorBase",
     ];
 
-    /// <summary>
-    /// Initializes a new instance of the Schema generator
-    /// </summary>
-    /// <param name="schemasPath">Path to the schemas folder</param>
-    public SchemaGenerator(string? schemasPath = null)
-    {
-        _schemasPath = schemasPath ?? Path.Combine(Entrypoint.ProjectRootPath, "data", "schemas");
-    }
-
     public override async Task<GeneratorResult> GenerateFilesAsync()
     {
         try
         {
-            Progress.Report("Loading SDK file...");
+            Progress.Report("Downloading SDK and entities files from CS2-Dumps...");
             if (Directory.Exists(OutputPath))
             {
                 Directory.Delete(OutputPath, true);
@@ -57,14 +43,14 @@ public class SchemaGenerator : BaseGenerator
             Directory.CreateDirectory(Path.Combine(OutputPath, "Classes"));
             Directory.CreateDirectory(Path.Combine(OutputPath, "Enums"));
 
-            Progress.Report($"Reading SDK from: {_schemasPath}");
+            var sdkJsonTask = httpClient.GetStringAsync(SdkUrl);
+            var entitiesJsonTask = httpClient.GetStringAsync(EntitiesUrl);
+            await Task.WhenAll(sdkJsonTask, entitiesJsonTask);
 
-            var jsonContent = await File.ReadAllTextAsync(Path.Combine(_schemasPath, "sdk.json"));
-            var sdkData = JsonSerializer.Deserialize<SDK>(jsonContent);
+            var sdkData = JsonSerializer.Deserialize<SDK>(await sdkJsonTask);
             Progress.Report($"Loaded SDK with {sdkData!.Enums.Count} enums and {sdkData!.Classes.Count} classes.");
 
-            var entitySystemJsonContent = await File.ReadAllTextAsync(Path.Combine(_schemasPath, "entitysystem.json"));
-            var entitySystemData = JsonSerializer.Deserialize<EntitySystem>(entitySystemJsonContent);
+            var entitySystemData = JsonSerializer.Deserialize<EntitySystem>(await entitiesJsonTask);
 
             Progress.Report($"Loaded Entity System with {entitySystemData!.EntityClasses.Count} entity classes.");
 
