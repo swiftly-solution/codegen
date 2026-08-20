@@ -10,17 +10,17 @@ public static class GeneratorOptions
     /// <summary>
     /// Dictionary of available generators mapped by their display name
     /// </summary>
-    private static readonly Dictionary<string, Func<string?, string?, string?, string?, string?, string?, BaseGenerator>> GeneratorFactories = new()
+    private static readonly Dictionary<string, Func<string?, bool, string?, bool, string?, string?, BaseGenerator>> GeneratorFactories = new()
     {
         { "Natives", (nativesPath, _, _, _, _, _) => new Natives(nativesPath) },
-        { "Game Events", (_, gameEventsPath, _, _, _, _) => new GameEvents(gameEventsPath) },
+        { "Game Events", (_, _, _, _, _, _) => new GameEvents() },
         { "Protobufs", (_, _, protobufsPath, _, _, _) => new Protobufs(protobufsPath) },
-        { "Datamaps", (_, _, _, datamapsPath, _, _) => new Datamaps(datamapsPath!) },
+        { "Datamaps", (_, _, _, _, _, _) => new Datamaps() },
         { "Schemas", (_, _, _, _, schemaPath, _) => new SchemaGenerator(schemaPath!) },
         { "Steamworks", (_, _, _, _, _, steamworksPath) => new SteamworksGenerator(steamworksPath) }
     };
 
-    public static async Task ShowGeneratorOptionsAsync(string? nativesPath, string? gameEventsPath, string? protobufsPath = null, string? datamapsPath = null, string? schemaPath = null, string? steamworksPath = null)
+    public static async Task ShowGeneratorOptionsAsync(string? nativesPath, bool gameEvents, string? protobufsPath = null, bool datamaps = false, string? schemaPath = null, string? steamworksPath = null)
     {
         var selectedGenerators = new List<string>();
 
@@ -29,7 +29,7 @@ public static class GeneratorOptions
             selectedGenerators.Add("Natives");
         }
 
-        if (!string.IsNullOrEmpty(gameEventsPath))
+        if (gameEvents)
         {
             selectedGenerators.Add("Game Events");
         }
@@ -39,7 +39,7 @@ public static class GeneratorOptions
             selectedGenerators.Add("Protobufs");
         }
 
-        if (!string.IsNullOrEmpty(datamapsPath))
+        if (datamaps)
         {
             selectedGenerators.Add("Datamaps");
         }
@@ -93,24 +93,9 @@ public static class GeneratorOptions
             }
         }
 
-        if (selectedGenerators.Contains("Game Events") && string.IsNullOrEmpty(gameEventsPath))
+        if (selectedGenerators.Contains("Game Events"))
         {
-            var defaultGameEventsPath = Path.Combine(Entrypoint.ProjectRootPath, "data", "gameevents");
-            if (Directory.Exists(defaultGameEventsPath))
-            {
-                var useDefault = AnsiConsole.Confirm($"Use default game events path: [grey]{defaultGameEventsPath}[/]?", true);
-                if (useDefault)
-                {
-                    gameEventsPath = defaultGameEventsPath;
-                }
-            }
-
-            if (string.IsNullOrEmpty(gameEventsPath))
-            {
-                AnsiConsole.MarkupLine("[yellow]Please select the game events folder:[/]");
-                gameEventsPath = Entrypoint.BrowseForDirectory("Browse for Game Events Folder", Entrypoint.ProjectRootPath);
-                AnsiConsole.MarkupLine($"[green]Selected game events path:[/] {gameEventsPath}");
-            }
+            AnsiConsole.MarkupLine("[grey]Game events files will be downloaded from CS2-Dumps.[/]");
         }
 
         if (selectedGenerators.Contains("Protobufs") && string.IsNullOrEmpty(protobufsPath))
@@ -133,24 +118,9 @@ public static class GeneratorOptions
             }
         }
 
-        if (selectedGenerators.Contains("Datamaps") && string.IsNullOrEmpty(datamapsPath))
+        if (selectedGenerators.Contains("Datamaps"))
         {
-            var defaultDatamapsPath = Path.Combine(Entrypoint.ProjectRootPath, "datamaps.json");
-            if (File.Exists(defaultDatamapsPath))
-            {
-                var useDefault = AnsiConsole.Confirm($"Use default datamaps file: [grey]{defaultDatamapsPath}[/]?", true);
-                if (useDefault)
-                {
-                    datamapsPath = defaultDatamapsPath;
-                }
-            }
-
-            if (string.IsNullOrEmpty(datamapsPath))
-            {
-                AnsiConsole.MarkupLine("[yellow]Please browse for datamaps.json file:[/]");
-                datamapsPath = Entrypoint.BrowseForFile("Browse for datamaps.json", Entrypoint.ProjectRootPath, ".json");
-                AnsiConsole.MarkupLine($"[green]Selected datamaps path:[/] {datamapsPath}");
-            }
+            AnsiConsole.MarkupLine("[grey]datamaps.json will be downloaded from CS2-Dumps.[/]");
         }
 
         if (selectedGenerators.Contains("Schemas") && string.IsNullOrEmpty(schemaPath))
@@ -203,7 +173,7 @@ public static class GeneratorOptions
 
         var generators = selectedGenerators.ToDictionary(
             name => name,
-            name => GeneratorFactories[name](nativesPath, gameEventsPath, protobufsPath, datamapsPath, schemaPath, steamworksPath)
+            name => GeneratorFactories[name](nativesPath, gameEvents, protobufsPath, datamaps, schemaPath, steamworksPath)
         );
 
         var generatorStatus = new Dictionary<string, GeneratorState>();

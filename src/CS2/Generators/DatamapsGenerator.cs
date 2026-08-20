@@ -1,4 +1,3 @@
-using System.Text;
 using System.Text.Json;
 
 namespace SwiftlyS2.Codegen.CS2.Generators;
@@ -6,9 +5,10 @@ namespace SwiftlyS2.Codegen.CS2.Generators;
 /// <summary>
 /// Generator for datamaps
 /// </summary>
-public class Datamaps(string datamapsPath) : BaseGenerator
+public class Datamaps : BaseGenerator
 {
-    private readonly string _datamapsPath = datamapsPath;
+    private static readonly HttpClient httpClient = new();
+    private const string DatamapsUrl = "https://raw.githubusercontent.com/Swiftly-Tracker/CS2-Dumps/main/dump/datamaps.json";
 
     public override string Name => "Datamaps";
     public override string OutputPath => Path.Combine("output", "src", "SwiftlyS2.Generated", "Datamaps");
@@ -28,10 +28,7 @@ public class Datamaps(string datamapsPath) : BaseGenerator
             Directory.CreateDirectory(Path.Combine(OutputPath, "Interfaces"));
             Directory.CreateDirectory(Path.Combine(OutputPath, "Classes"));
 
-            Progress.Report($"Reading datamaps from: {_datamapsPath}");
-
-            // Read and parse the datamaps JSON file
-            var jsonContent = await File.ReadAllTextAsync(_datamapsPath);
+            var jsonContent = await FetchDatamapsJsonAsync();
             var datamapsData = JsonSerializer.Deserialize<DatamapsRoot>(jsonContent);
 
             if (datamapsData?.Datamaps == null)
@@ -48,39 +45,32 @@ public class Datamaps(string datamapsPath) : BaseGenerator
             var serviceFunctions = new List<string>();
             var serviceInterfaceFunctions = new List<string>();
 
-            Progress.Report($"Processing {datamapsData.Datamaps.Count} datamap classes...");
+            var thinkFunctionOwners = ResolveThinkFunctionOwners(datamapsData.Datamaps);
 
-            foreach (var clazz in datamapsData.Datamaps)
+            Progress.Report($"Processing {thinkFunctionOwners.Count} think functions...");
+
+            foreach (var (functionName, className) in thinkFunctionOwners)
             {
-                var className = clazz.ClassName;
+                var name = functionName.Replace("::", "_");
 
-                foreach (var field in clazz.Fields)
-                {
-                    if (field.IsFunction)
-                    {
-                        var name = field.FieldName.Replace("::", "_");
-                        var hash = field.FunctionHash;
+                managerFunctions.Add($"public BaseDatamapFunction<{className}, DHook{name}> {name} {{ get; init; }}");
+                managerConstructors.Add($"{name} = new(this, \"{functionName}\");");
+                serviceFunctions.Add($"\n    public IDatamapFunctionOperator<{className}, DHook{name}> {name} {{ get; }} = manager.{name}.Get(ctx.Name, profiler);\n\n    IDatamapFunctionOperator<{className}, IDHook{name}> IDatamapFunctionService.{name} => {name};");
+                serviceInterfaceFunctions.Add($"\n    public IDatamapFunctionOperator<{className}, IDHook{name}> {name} {{ get; }}");
 
-                        managerFunctions.Add($"public BaseDatamapFunction<{className}, DHook{name}> {name} {{ get; init; }}");
-                        managerConstructors.Add($"        {name} = new(this, {hash});");
-                        serviceFunctions.Add($"\n    public IDatamapFunctionOperator<{className}, DHook{name}> {name} {{ get; }} = manager.{name}.Get(ctx.Name, profiler);\n\n    IDatamapFunctionOperator<{className}, IDHook{name}> IDatamapFunctionService.{name} => {name};");
-                        serviceInterfaceFunctions.Add($"\n    public IDatamapFunctionOperator<{className}, IDHook{name}> {name} {{ get; }}");
+                // Write hook context class
+                var hookContextWriter = new CodeWriter();
+                WriteHookContext(hookContextWriter, className, name);
+                await File.WriteAllTextAsync(
+                    Path.Combine(OutputPath, "Classes", $"DHook{name}.cs"),
+                    hookContextWriter.ToString());
 
-                        // Write hook context class
-                        var hookContextWriter = new CodeWriter();
-                        WriteHookContext(hookContextWriter, className, name);
-                        await File.WriteAllTextAsync(
-                            Path.Combine(OutputPath, "Classes", $"DHook{name}.cs"),
-                            hookContextWriter.ToString());
-
-                        // Write hook context interface
-                        var hookContextInterfaceWriter = new CodeWriter();
-                        WriteHookContextInterface(hookContextInterfaceWriter, className, name);
-                        await File.WriteAllTextAsync(
-                            Path.Combine(OutputPath, "Interfaces", $"IDHook{name}.cs"),
-                            hookContextInterfaceWriter.ToString());
-                    }
-                }
+                // Write hook context interface
+                var hookContextInterfaceWriter = new CodeWriter();
+                WriteHookContextInterface(hookContextInterfaceWriter, className, name);
+                await File.WriteAllTextAsync(
+                    Path.Combine(OutputPath, "Interfaces", $"IDHook{name}.cs"),
+                    hookContextInterfaceWriter.ToString());
             }
 
             Progress.Report("Writing manager and service files...");
@@ -120,6 +110,43 @@ public class Datamaps(string datamapsPath) : BaseGenerator
                 Exception = ex
             };
         }
+    }
+
+    private async Task<string> FetchDatamapsJsonAsync()
+    {
+        Progress.Report("Downloading datamaps.json from CS2-Dumps...");
+        return await httpClient.GetStringAsync(DatamapsUrl);
+    }
+
+    private static Dictionary<string, string> ResolveThinkFunctionOwners(List<DatamapClass> classes)
+    {
+        var candidates = new Dictionary<string, List<string>>();
+        foreach (var clazz in classes)
+        {
+            foreach (var functionName in clazz.ThinkFunctions)
+            {
+                if (!candidates.TryGetValue(functionName, out var list))
+                {
+                    list = new List<string>();
+                    candidates[functionName] = list;
+                }
+                if (!list.Contains(clazz.ClassName))
+                {
+                    list.Add(clazz.ClassName);
+                }
+            }
+        }
+
+        var owners = new Dictionary<string, string>();
+        foreach (var (functionName, classNames) in candidates)
+        {
+            var owner = classNames
+                .Where(c => functionName.StartsWith(c, StringComparison.Ordinal))
+                .OrderByDescending(c => c.Length)
+                .FirstOrDefault() ?? classNames[0];
+            owners[functionName] = owner;
+        }
+        return owners;
     }
 
     #region Code Generation Methods
@@ -223,20 +250,8 @@ public class Datamaps(string datamapsPath) : BaseGenerator
         [System.Text.Json.Serialization.JsonPropertyName("class_name")]
         public string ClassName { get; set; } = "";
 
-        [System.Text.Json.Serialization.JsonPropertyName("fields")]
-        public List<DatamapField> Fields { get; set; } = new();
-    }
-
-    private class DatamapField
-    {
-        [System.Text.Json.Serialization.JsonPropertyName("fieldName")]
-        public string FieldName { get; set; } = "";
-
-        [System.Text.Json.Serialization.JsonPropertyName("isFunction")]
-        public bool IsFunction { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("functionHash")]
-        public ulong FunctionHash { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("think_functions")]
+        public List<string> ThinkFunctions { get; set; } = new();
     }
 
     #endregion

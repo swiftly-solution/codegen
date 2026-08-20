@@ -50,15 +50,6 @@ public class GameEvents : BaseGenerator
 
     private readonly List<uint> hashes = [];
 
-    /// <summary>
-    /// Initializes a new instance of the GameEvents generator
-    /// </summary>
-    /// <param name="dataPath">Optional custom path to the game events folder</param>
-    public GameEvents(string? dataPath = null)
-    {
-        DataPath = dataPath;
-    }
-
     /// <inheritdoc />
     public override string Name => "Game Events";
 
@@ -71,14 +62,12 @@ public class GameEvents : BaseGenerator
         try
         {
             Progress.Report("Initializing game events generation...");
-            var gameEventsDir = DataPath ?? Path.Combine(Entrypoint.ProjectRootPath, "data", "gameevents");
-            Directory.CreateDirectory(gameEventsDir);
 
             Progress.Report("Downloading game events files...");
-            await DownloadGameEventsAsync(gameEventsDir);
+            var fileContents = await DownloadGameEventsAsync();
 
             Progress.Report("Parsing game events...");
-            var allEvents = await ParseAllGameEventsAsync(gameEventsDir);
+            var allEvents = ParseAllGameEvents(fileContents);
             Progress.Report($"Parsed {allEvents.Count} game event(s)");
 
             var interfacesDir = Path.Combine(OutputPath, "Interfaces");
@@ -120,7 +109,7 @@ public class GameEvents : BaseGenerator
         }
     }
 
-    private async Task DownloadGameEventsAsync(string outputDir)
+    private async Task<Dictionary<string, string>> DownloadGameEventsAsync()
     {
         var files = new Dictionary<string, string>
         {
@@ -129,40 +118,28 @@ public class GameEvents : BaseGenerator
             { "mod.gameevents", "https://raw.githubusercontent.com/Swiftly-Tracker/CS2-Dumps/main/install/game/csgo/pak01/resource/mod.gameevents" }
         };
 
+        var contents = new Dictionary<string, string>();
         int count = 0;
         foreach (var (filename, url) in files)
         {
             count++;
-            var filePath = Path.Combine(outputDir, filename);
-            try
-            {
-                Progress.Report($"Downloading {filename} ({count}/{files.Count})...");
-                var content = await httpClient.GetStringAsync(url);
-                await File.WriteAllTextAsync(filePath, content);
-            }
-            catch (Exception ex)
-            {
-                if (!File.Exists(filePath))
-                {
-                    throw new Exception($"Failed to download {filename} and no local file exists: {ex.Message}");
-                }
-                Progress.Report($"Using cached {filename}");
-            }
+            Progress.Report($"Downloading {filename} ({count}/{files.Count})...");
+            contents[filename] = await httpClient.GetStringAsync(url);
         }
+        return contents;
     }
 
-    private async Task<Dictionary<string, GameEventDef>> ParseAllGameEventsAsync(string dir)
+    private Dictionary<string, GameEventDef> ParseAllGameEvents(Dictionary<string, string> fileContents)
     {
         var allEvents = new Dictionary<string, GameEventDef>();
         var fileOrder = new[] { "core.gameevents", "game.gameevents", "mod.gameevents" };
 
         foreach (var filename in fileOrder)
         {
-            var filePath = Path.Combine(dir, filename);
-            if (!File.Exists(filePath))
+            if (!fileContents.TryGetValue(filename, out var content))
                 continue;
 
-            var events = await ParseGameEventsFileAsync(filePath);
+            var events = ParseGameEventsFile(content);
             foreach (var (name, ev) in events)
             {
                 if (!allEvents.TryGetValue(name, out GameEventDef? value))
@@ -182,10 +159,10 @@ public class GameEvents : BaseGenerator
         return allEvents;
     }
 
-    private async Task<Dictionary<string, GameEventDef>> ParseGameEventsFileAsync(string path)
+    private Dictionary<string, GameEventDef> ParseGameEventsFile(string content)
     {
         var events = new Dictionary<string, GameEventDef>();
-        var lines = await File.ReadAllLinesAsync(path);
+        var lines = content.Replace("\r\n", "\n").Split('\n');
 
         int i = 0;
         while (i < lines.Length)

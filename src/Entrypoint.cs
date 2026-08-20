@@ -34,9 +34,9 @@ public static class Entrypoint
     {
         // Parse command-line arguments
         string? nativesPath = null;
-        string? gameEventsPath = null;
+        bool gameEvents = false;
         string? protobufsPath = null;
-        string? datamapsPath = null;
+        bool datamaps = false;
         string? schemaPath = null;
         string? steamworksPath = null;
         string? game = null;
@@ -53,20 +53,18 @@ public static class Entrypoint
                 nativesPath = args[i + 1];
                 i++;
             }
-            else if ((args[i] == "--gameevents-path" || args[i] == "-g") && i + 1 < args.Length)
+            else if (args[i] == "--gameevents" || args[i] == "-g")
             {
-                gameEventsPath = args[i + 1];
-                i++;
+                gameEvents = true;
             }
             else if ((args[i] == "--protobufs-path" || args[i] == "-p") && i + 1 < args.Length)
             {
                 protobufsPath = args[i + 1];
                 i++;
             }
-            else if ((args[i] == "--datamaps-path" || args[i] == "-d") && i + 1 < args.Length)
+            else if (args[i] == "--datamaps" || args[i] == "-d")
             {
-                datamapsPath = args[i + 1];
-                i++;
+                datamaps = true;
             }
             else if ((args[i] == "--schema-path" || args[i] == "-schema") && i + 1 < args.Length)
             {
@@ -100,7 +98,7 @@ public static class Entrypoint
         {
             case "Counter-Strike: 2":
             case "cs2":
-                await CS2.GeneratorOptions.ShowGeneratorOptionsAsync(nativesPath, gameEventsPath, protobufsPath, datamapsPath, schemaPath, steamworksPath);
+                await CS2.GeneratorOptions.ShowGeneratorOptionsAsync(nativesPath, gameEvents, protobufsPath, datamaps, schemaPath, steamworksPath);
                 break;
             default:
                 AnsiConsole.MarkupLine("[red]Error:[/] Unknown game selected.");
@@ -117,16 +115,16 @@ public static class Entrypoint
         AnsiConsole.WriteLine();
         AnsiConsole.MarkupLine("[bold]Options:[/]");
         AnsiConsole.MarkupLine("  -n, --natives-path <path>      Path to the natives folder");
-        AnsiConsole.MarkupLine("  -g, --gameevents-path <path>   Path to the game events folder");
+        AnsiConsole.MarkupLine("  -g, --gameevents               Generate game events (downloaded from CS2-Dumps)");
         AnsiConsole.MarkupLine("  -p, --protobufs-path <path>    Path to the protobufs folder");
-        AnsiConsole.MarkupLine("  -d, --datamaps-path <path>     Path to the datamaps.json file");
+        AnsiConsole.MarkupLine("  -d, --datamaps                 Generate datamaps (downloaded from CS2-Dumps)");
         AnsiConsole.MarkupLine("  -schema, --schema-path <path>  Path to the schema folder");
         AnsiConsole.MarkupLine("  -s, --steamworks-path <path>   Path to the steam api folder");
         AnsiConsole.MarkupLine("  -h, --help                     Show this help message");
         AnsiConsole.WriteLine();
         AnsiConsole.MarkupLine("[bold]Examples:[/]");
         AnsiConsole.MarkupLine("  SwiftlyS2.Codegen --natives-path C:\\path\\to\\natives");
-        AnsiConsole.MarkupLine("  SwiftlyS2.Codegen -n C:\\path\\to\\natives -g C:\\path\\to\\gameevents -s C:\\path\\to\\steam\\folder");
+        AnsiConsole.MarkupLine("  SwiftlyS2.Codegen -n C:\\path\\to\\natives -g -s C:\\path\\to\\steam\\folder");
     }
 
     public static string BrowseForDirectory(string title, string? defaultPath = null)
