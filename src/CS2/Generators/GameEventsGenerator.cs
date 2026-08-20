@@ -124,9 +124,9 @@ public class GameEvents : BaseGenerator
     {
         var files = new Dictionary<string, string>
         {
-            { "core.gameevents", "https://raw.githubusercontent.com/SteamDatabase/GameTracking-CS2/master/game/core/pak01_dir/resource/core.gameevents" },
-            { "game.gameevents", "https://raw.githubusercontent.com/SteamDatabase/GameTracking-CS2/master/game/csgo/pak01_dir/resource/game.gameevents" },
-            { "mod.gameevents", "https://raw.githubusercontent.com/SteamDatabase/GameTracking-CS2/master/game/csgo/pak01_dir/resource/mod.gameevents" }
+            { "core.gameevents", "https://raw.githubusercontent.com/Swiftly-Tracker/CS2-Dumps/main/install/game/core/pak01/resource/core.gameevents" },
+            { "game.gameevents", "https://raw.githubusercontent.com/Swiftly-Tracker/CS2-Dumps/main/install/game/csgo/pak01/resource/game.gameevents" },
+            { "mod.gameevents", "https://raw.githubusercontent.com/Swiftly-Tracker/CS2-Dumps/main/install/game/csgo/pak01/resource/mod.gameevents" }
         };
 
         int count = 0;
