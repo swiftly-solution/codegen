@@ -9,7 +9,7 @@ namespace SwiftlyS2.Codegen.CS2.Generators;
 /// </summary>
 public class GameEvents : BaseGenerator
 {
-    private static readonly HttpClient httpClient = new();
+    private static readonly HttpClient httpClient = CreateHttpClient();
 
     private static readonly Dictionary<string, (string CsType, string Accessor, bool CanSet, string? CastKind)> TypeMap = new()
     {

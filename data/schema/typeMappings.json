@@ -78,6 +78,7 @@
         "DegreeEuler",
         "CUtlSymbol",
         "CUtlOrderedMap",
+        "CUtlStringMap",
         "CUtlMap",
         "CSmartPtr",
         "CUtlHashtable",

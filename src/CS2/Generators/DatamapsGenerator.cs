@@ -4,7 +4,7 @@ namespace SwiftlyS2.Codegen.CS2.Generators;
 
 public class Datamaps : BaseGenerator
 {
-    private static readonly HttpClient httpClient = new();
+    private static readonly HttpClient httpClient = CreateHttpClient();
     private const string DatamapsUrl = "https://raw.githubusercontent.com/Swiftly-Tracker/CS2-Dumps/main/dump/datamaps.json";
 
     public override string Name => "Datamaps";

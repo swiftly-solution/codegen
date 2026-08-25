@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.VisualBasic.FileIO;
@@ -12,7 +13,7 @@ namespace SwiftlyS2.Codegen.CS2.Generators;
 /// </summary>
 public class SchemaGenerator : BaseGenerator
 {
-    private static readonly HttpClient httpClient = new();
+    private static readonly HttpClient httpClient = CreateHttpClient();
     private const string SdkUrl = "https://raw.githubusercontent.com/Swiftly-Tracker/CS2-Dumps/main/dump/sdk.json";
     private const string EntitiesUrl = "https://raw.githubusercontent.com/Swiftly-Tracker/CS2-Dumps/main/dump/entities.json";
 
@@ -43,12 +44,18 @@ public class SchemaGenerator : BaseGenerator
             Directory.CreateDirectory(Path.Combine(OutputPath, "Classes"));
             Directory.CreateDirectory(Path.Combine(OutputPath, "Enums"));
 
-            var sdkJsonTask = httpClient.GetStringAsync(SdkUrl);
-            var entitiesJsonTask = httpClient.GetStringAsync(EntitiesUrl);
+            var sdkJsonTask = DownloadWithProgressAsync(SdkUrl, "sdk.json");
+            var entitiesJsonTask = DownloadWithProgressAsync(EntitiesUrl, "entities.json");
             await Task.WhenAll(sdkJsonTask, entitiesJsonTask);
 
             var sdkData = JsonSerializer.Deserialize<SDK>(await sdkJsonTask);
             Progress.Report($"Loaded SDK with {sdkData!.Enums.Count} enums and {sdkData!.Classes.Count} classes.");
+
+            sdkData.Classes = sdkData.Classes
+                .Where(c => !string.Equals(c.Project, "smartprops", StringComparison.OrdinalIgnoreCase))
+                .Where(c => !(string.Equals(c.Project, "client", StringComparison.OrdinalIgnoreCase) && c.Name == "CCSCustomHudLayoutState"))
+                .ToList();
+            sdkData.Enums = sdkData.Enums.Where(e => !string.Equals(e.Project, "smartprops", StringComparison.OrdinalIgnoreCase)).ToList();
 
             var entitySystemData = JsonSerializer.Deserialize<EntitySystem>(await entitiesJsonTask);
 
@@ -92,6 +99,43 @@ public class SchemaGenerator : BaseGenerator
                 Exception = ex
             };
         }
+    }
+
+    private async Task<string> DownloadWithProgressAsync(string url, string label)
+    {
+        using var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+        response.EnsureSuccessStatusCode();
+
+        var totalBytes = response.Content.Headers.ContentLength;
+        await using var stream = await response.Content.ReadAsStreamAsync();
+        using var memoryStream = new MemoryStream();
+        var buffer = new byte[81920];
+        long totalRead = 0;
+        var lastReportedPercent = -1;
+        int bytesRead;
+
+        while ((bytesRead = await stream.ReadAsync(buffer)) > 0)
+        {
+            await memoryStream.WriteAsync(buffer.AsMemory(0, bytesRead));
+            totalRead += bytesRead;
+
+            if (totalBytes.HasValue)
+            {
+                var percent = (int)(totalRead * 100 / totalBytes.Value);
+                if (percent != lastReportedPercent)
+                {
+                    lastReportedPercent = percent;
+                    Progress.Report($"Downloading {label}... {percent}% ({totalRead / 1024}KB / {totalBytes.Value / 1024}KB)");
+                }
+            }
+            else
+            {
+                Progress.Report($"Downloading {label}... {totalRead / 1024}KB");
+            }
+        }
+
+        Progress.Report($"Downloaded {label} ({totalRead / 1024}KB).");
+        return Encoding.UTF8.GetString(memoryStream.ToArray());
     }
 
     private void WriteClassConvertor(EntitySystem entitySystemData)

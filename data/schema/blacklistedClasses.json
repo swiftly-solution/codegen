@@ -8,6 +8,7 @@
         "CEntityIOOutput",
         "ChangeAccessorFieldPathIndex_t",
         "CEntityKeyValues",
-        "ENetworkDisconnectionReason"
+        "ENetworkDisconnectionReason",
+        "CTextureSheetDoc"
     ]
 }
