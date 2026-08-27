@@ -252,13 +252,17 @@ public class Natives : BaseGenerator
             writer.AddLine($"var {paramName}Length = {paramName}.Length;");
         }
 
-        if (stringParams.Count > 0)
+        foreach (var paramName in stringParams)
         {
-            WriteStringAllocCalls(writer, returnType, functionName, nativeParams, stringParams, bytesParams, 0);
+            writer.AddLine($"using var {paramName}Str = new ScopedCString({paramName});");
         }
-        else if (bytesParams.Count > 0)
+
+        var fixedBlocks = stringParams.Select(p => $"fixed (byte* {p}BufferPtr = {p}Str)")
+            .Concat(bytesParams.Select(p => $"fixed (byte* {p}BufferPtr = {p})"))
+            .ToList();
+
+        if (fixedBlocks.Count > 0)
         {
-            var fixedBlocks = bytesParams.Select(p => $"fixed (byte* {p}BufferPtr = {p})").ToList();
             WriteWithFixedBlocks(writer, fixedBlocks, 0, () =>
             {
                 WriteNativeCall(writer, returnType, functionName, nativeParams);
@@ -267,38 +271,6 @@ public class Natives : BaseGenerator
         else
         {
             WriteNativeCall(writer, returnType, functionName, nativeParams);
-        }
-    }
-
-    private void WriteStringAllocCalls(CodeWriter writer, string returnType, string functionName,
-        List<(string type, string name)> nativeParams, List<string> stringParams, List<string> bytesParams, int index)
-    {
-        if (index < stringParams.Count)
-        {
-            var paramName = stringParams[index];
-            var returnPrefix = returnType != "void" ? "return " : "";
-
-            writer.AddLine($"{returnPrefix}StringAlloc.CreateCString({paramName}, {paramName}BufferPtr =>");
-            writer.AddLine("{");
-            writer.Indent();
-            WriteStringAllocCalls(writer, returnType, functionName, nativeParams, stringParams, bytesParams, index + 1);
-            writer.Dedent();
-            writer.AddLine("});");
-        }
-        else
-        {
-            if (bytesParams.Count > 0)
-            {
-                var fixedBlocks = bytesParams.Select(p => $"fixed (byte* {p}BufferPtr = {p})").ToList();
-                WriteWithFixedBlocks(writer, fixedBlocks, 0, () =>
-                {
-                    WriteNativeCall(writer, returnType, functionName, nativeParams);
-                });
-            }
-            else
-            {
-                WriteNativeCall(writer, returnType, functionName, nativeParams);
-            }
         }
     }
 
@@ -384,7 +356,7 @@ public class Natives : BaseGenerator
         {
             if (type == "string")
             {
-                args.Add($"(byte*){name}BufferPtr");
+                args.Add($"{name}BufferPtr");
             }
             else if (type == "bytes")
             {
