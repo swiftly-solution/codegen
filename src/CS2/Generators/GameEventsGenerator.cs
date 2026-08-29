@@ -353,7 +353,7 @@ public class GameEvents : BaseGenerator
         });
 
         var filePath = Path.Combine(outputDir, $"{typeName}.cs");
-        File.WriteAllText(filePath, writer.GetCode("\r\n") + "\r\n");
+        File.WriteAllText(filePath, writer.GetCode() + "\n");
     }
 
     private void GenerateClass(GameEventDef ev, string outputDir)
@@ -384,7 +384,7 @@ public class GameEvents : BaseGenerator
         });
 
         var filePath = Path.Combine(outputDir, $"{typeName}Impl.cs");
-        File.WriteAllText(filePath, writer.GetCode("\r\n") + "\r\n");
+        File.WriteAllText(filePath, writer.GetCode() + "\n");
     }
 
     private static void RenderHeaderComment(CodeWriter writer, GameEventDef ev)
