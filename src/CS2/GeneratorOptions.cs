@@ -20,7 +20,7 @@ public static class GeneratorOptions
         { "Steamworks", (_, _, _, _, _, steamworksPath) => new SteamworksGenerator(steamworksPath) }
     };
 
-    public static async Task ShowGeneratorOptionsAsync(string? nativesPath, bool gameEvents, string? protobufsPath = null, bool datamaps = false, bool schemas = false, string? steamworksPath = null)
+    public static async Task<bool> ShowGeneratorOptionsAsync(string? nativesPath, bool gameEvents, string? protobufsPath = null, bool datamaps = false, bool schemas = false, string? steamworksPath = null)
     {
         var selectedGenerators = new List<string>();
 
@@ -69,7 +69,7 @@ public static class GeneratorOptions
         if (!selectedGenerators.Any())
         {
             AnsiConsole.MarkupLine("[yellow]No generators selected.[/]");
-            return;
+            return false;
         }
 
         // Prompt for paths if not provided
@@ -167,50 +167,72 @@ public static class GeneratorOptions
             generatorStatus[name] = new GeneratorState { Status = ExecutionStatus.Running };
         }
 
-        await AnsiConsole.Live(CreateStatusTable(generatorStatus, startTime))
-            .StartAsync(async ctx =>
-            {
-                var generatorTasks = selectedGenerators.Select(async name =>
+        if (AnsiConsole.Profile.Capabilities.Interactive)
+        {
+            await AnsiConsole.Live(CreateStatusTable(generatorStatus, startTime))
+                .StartAsync(async ctx =>
                 {
-                    var generator = generators[name];
-                    var result = await generator.GenerateFilesAsync();
-                    generatorStatus[name] = new GeneratorState
+                    var generatorTasks = selectedGenerators.Select(async name =>
                     {
-                        Status = result.Success ? ExecutionStatus.Completed : ExecutionStatus.Failed,
-                        Result = result,
-                        StatusHistory = generator.Progress.History.ToList(),
-                        CurrentStatus = generator.Progress.CurrentStatus
-                    };
-                    ctx.UpdateTarget(CreateStatusTable(generatorStatus, startTime));
-                    return (name, result);
-                }).ToArray();
-
-                var updateTask = Task.Run(async () =>
-                {
-                    while (generatorStatus.Values.Any(s => s.Status == ExecutionStatus.Running))
-                    {
-                        await Task.Delay(100);
-
-                        // Update status history from generators
-                        foreach (var name in selectedGenerators)
+                        var generator = generators[name];
+                        var result = await generator.GenerateFilesAsync();
+                        generatorStatus[name] = new GeneratorState
                         {
-                            if (generatorStatus[name].Status == ExecutionStatus.Running)
-                            {
-                                var generator = generators[name];
-                                generatorStatus[name].StatusHistory = generator.Progress.History.ToList();
-                                generatorStatus[name].CurrentStatus = generator.Progress.CurrentStatus;
-                            }
-                        }
-
+                            Status = result.Success ? ExecutionStatus.Completed : ExecutionStatus.Failed,
+                            Result = result,
+                            StatusHistory = generator.Progress.History.ToList(),
+                            CurrentStatus = generator.Progress.CurrentStatus
+                        };
                         ctx.UpdateTarget(CreateStatusTable(generatorStatus, startTime));
-                    }
+                        return (name, result);
+                    }).ToArray();
+
+                    var updateTask = Task.Run(async () =>
+                    {
+                        while (generatorStatus.Values.Any(s => s.Status == ExecutionStatus.Running))
+                        {
+                            await Task.Delay(100);
+
+                            // Update status history from generators
+                            foreach (var name in selectedGenerators)
+                            {
+                                if (generatorStatus[name].Status == ExecutionStatus.Running)
+                                {
+                                    var generator = generators[name];
+                                    generatorStatus[name].StatusHistory = generator.Progress.History.ToList();
+                                    generatorStatus[name].CurrentStatus = generator.Progress.CurrentStatus;
+                                }
+                            }
+
+                            ctx.UpdateTarget(CreateStatusTable(generatorStatus, startTime));
+                        }
+                    });
+
+                    await Task.WhenAll(generatorTasks);
+                    await updateTask;
+
+                    ctx.UpdateTarget(CreateStatusTable(generatorStatus, startTime));
                 });
+        }
+        else
+        {
+            var results = await Task.WhenAll(selectedGenerators.Select(async name =>
+            {
+                var generator = generators[name];
+                return (Name: name, Generator: generator, Result: await generator.GenerateFilesAsync());
+            }));
 
-                var results = await Task.WhenAll(generatorTasks);
-                await updateTask;
-
-                ctx.UpdateTarget(CreateStatusTable(generatorStatus, startTime));
-            });
+            foreach (var result in results)
+            {
+                generatorStatus[result.Name] = new GeneratorState
+                {
+                    Status = result.Result.Success ? ExecutionStatus.Completed : ExecutionStatus.Failed,
+                    Result = result.Result,
+                    StatusHistory = result.Generator.Progress.History.ToList(),
+                    CurrentStatus = result.Generator.Progress.CurrentStatus
+                };
+            }
+        }
 
         AnsiConsole.WriteLine();
         var failedGenerators = generatorStatus.Where(kvp => kvp.Value.Status == ExecutionStatus.Failed).ToList();
@@ -239,6 +261,8 @@ public static class GeneratorOptions
             var elapsed = DateTime.Now - startTime;
             AnsiConsole.MarkupLine($"[green]✓ All generators completed successfully in {elapsed.TotalSeconds:F2}s![/]");
         }
+
+        return !failedGenerators.Any();
     }
 
     private static Table CreateStatusTable(Dictionary<string, GeneratorState> generatorStatus, DateTime startTime)

@@ -30,7 +30,7 @@ public static class Entrypoint
         }
     }
 
-    public static async Task Main(string[] args)
+    public static async Task<int> Main(string[] args)
     {
         // Parse command-line arguments
         string? nativesPath = null;
@@ -78,7 +78,7 @@ public static class Entrypoint
             else if (args[i] == "--help" || args[i] == "-h")
             {
                 ShowHelp();
-                return;
+                return 0;
             }
         }
 
@@ -97,11 +97,10 @@ public static class Entrypoint
         {
             case "Counter-Strike: 2":
             case "cs2":
-                await CS2.GeneratorOptions.ShowGeneratorOptionsAsync(nativesPath, gameEvents, protobufsPath, datamaps, schemas, steamworksPath);
-                break;
+                return await CS2.GeneratorOptions.ShowGeneratorOptionsAsync(nativesPath, gameEvents, protobufsPath, datamaps, schemas, steamworksPath) ? 0 : 1;
             default:
                 AnsiConsole.MarkupLine("[red]Error:[/] Unknown game selected.");
-                return;
+                return 1;
         }
     }
 
