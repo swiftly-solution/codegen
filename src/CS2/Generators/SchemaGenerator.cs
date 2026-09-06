@@ -147,6 +147,16 @@ public class SchemaGenerator : BaseGenerator
         writer.AddLine("");
         writer.AddBlock("internal static class ClassConvertor", () =>
         {
+            writer.AddBlock("public static readonly HashSet<string> DesignerNames =", () =>
+            {
+                foreach (var entityClass in entitySystemData.EntityClasses)
+                {
+                    writer.AddLine($"\"{entityClass.DesignerName}\",");
+                }
+            }, openBrace: "[", closeBrace: "];");
+
+            writer.AddLine();
+
             writer.AddBlock("public static CEntityInstance ConvertEntityByDesignerName( nint address, string designerName )", () =>
             {
                 writer.AddBlock("return designerName switch", () =>
