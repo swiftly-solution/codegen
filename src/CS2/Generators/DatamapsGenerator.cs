@@ -28,9 +28,9 @@ public class Datamaps : BaseGenerator
             Directory.CreateDirectory(Path.Combine(OutputPath, "Classes"));
 
             var jsonContent = await FetchDatamapsJsonAsync();
-            var datamapsData = JsonSerializer.Deserialize<DatamapsRoot>(jsonContent);
+            var datamapsData = JsonSerializer.Deserialize<List<DatamapClass>>(jsonContent);
 
-            if (datamapsData?.Datamaps == null)
+            if (datamapsData == null)
             {
                 return new GeneratorResult
                 {
@@ -39,7 +39,7 @@ public class Datamaps : BaseGenerator
                 };
             }
 
-            var thinkFunctionOwners = ResolveThinkFunctionOwners(datamapsData.Datamaps);
+            var thinkFunctionOwners = ResolveThinkFunctionOwners(datamapsData);
 
             Progress.Report($"Processing {thinkFunctionOwners.Count} think functions...");
 
@@ -669,12 +669,6 @@ public class Datamaps : BaseGenerator
     }
 
     private static string EscapeString(string value) => value.Replace("\\", "\\\\").Replace("\"", "\\\"");
-
-    private class DatamapsRoot
-    {
-        [System.Text.Json.Serialization.JsonPropertyName("datamaps")]
-        public List<DatamapClass> Datamaps { get; set; } = new();
-    }
 
     private class DatamapClass
     {
