@@ -294,29 +294,68 @@ internal static class InterfacesGenerator
         ["nullptr"] = "null",
     };
 
+    private readonly record struct NativeLine(string Text, string? Entry = null)
+    {
+        public static implicit operator NativeLine(string text) => new(text);
+    }
+
     // ─── Entry Point ─────────────────────────────────────────────────────────────
 
     public static async Task GenerateAsync(SteamworksParser parser, string outputPath, string templatesPath)
     {
-        var nativeMethods = new List<string>();
+        var nativeMethods = new List<NativeLine>();
+        var usedNatives   = new HashSet<string>();
 
         foreach (var f in parser.Files)
-            await ParseFile(f, parser.Typedefs, nativeMethods, outputPath);
+            await ParseFile(f, parser.Typedefs, nativeMethods, usedNatives, outputPath);
 
         string templateContent = await File.ReadAllTextAsync(Path.Combine(templatesPath, "nativemethods.txt"));
 
         var sb = new StringBuilder();
         sb.Append(templateContent);
-        foreach (var line in nativeMethods)
+        foreach (var line in PruneNativeMethods(nativeMethods, usedNatives))
             sb.AppendLine(line);
         sb.AppendLine("}");
 
         await File.WriteAllTextAsync(Path.Combine(outputPath, "NativeMethods.cs"), sb.ToString(), Encoding.UTF8);
     }
 
+    private static List<string> PruneNativeMethods(List<NativeLine> lines, HashSet<string> used)
+    {
+        var kept = lines
+            .Where(l => l.Entry is null || used.Contains(l.Entry))
+            .Select(l => l.Text)
+            .ToList();
+
+        bool changed = true;
+        while (changed)
+        {
+            changed = false;
+            for (int i = 0; i < kept.Count; i++)
+            {
+                bool isRegion = kept[i].StartsWith("#region");
+                if (!isRegion && !kept[i].StartsWith("#if "))
+                    continue;
+
+                string close = isRegion ? "#endregion" : "#endif";
+                int j = i + 1;
+                while (j < kept.Count && kept[j].Length == 0) j++;
+                if (j < kept.Count && kept[j] == close)
+                {
+                    kept.RemoveRange(i, j - i + 1);
+                    changed = true;
+                    break;
+                }
+            }
+        }
+
+        return kept;
+    }
+
     // ─── Per-File ────────────────────────────────────────────────────────────────
 
-    private static async Task ParseFile(SteamFile f, List<Typedef> typedefs, List<string> nativeMethods, string outputPath)
+    private static async Task ParseFile(SteamFile f, List<Typedef> typedefs, List<NativeLine> nativeMethods,
+        HashSet<string> usedNatives, string outputPath)
     {
         if (SkippedFiles.Contains(f.Name))
             return;
@@ -324,7 +363,7 @@ internal static class InterfacesGenerator
         var output = new List<string>();
 
         foreach (var iface in f.Interfaces)
-            ParseInterface(f, iface, typedefs, nativeMethods, output);
+            ParseInterface(f, iface, typedefs, nativeMethods, usedNatives, output);
 
         if (output.Count == 0)
             return;
@@ -352,7 +391,7 @@ internal static class InterfacesGenerator
     // ─── Per-Interface ────────────────────────────────────────────────────────────
 
     private static void ParseInterface(SteamFile f, Interface iface, List<Typedef> typedefs,
-        List<string> nativeMethods, List<string> output)
+        List<NativeLine> nativeMethods, HashSet<string> usedNatives, List<string> output)
     {
         if (SkippedInterfaces.Contains(iface.Name))
             return;
@@ -408,7 +447,7 @@ internal static class InterfacesGenerator
             if (func.Private)
                 continue;
 
-            ParseFunc(f, iface, func, typedefs, isClientInterface, bGameServerVersion, nativeMethods, output);
+            ParseFunc(f, iface, func, typedefs, isClientInterface, bGameServerVersion, nativeMethods, usedNatives, output);
         }
 
         // Remove trailing blank line appended by last ParseFunc call
@@ -433,7 +472,8 @@ internal static class InterfacesGenerator
     // ─── Per-Function ─────────────────────────────────────────────────────────────
 
     private static void ParseFunc(SteamFile f, Interface iface, Function func, List<Typedef> typedefs,
-        bool isClientInterface, bool bGameServerVersion, List<string> nativeMethods, List<string> output)
+        bool isClientInterface, bool bGameServerVersion, List<NativeLine> nativeMethods, HashSet<string> usedNatives,
+        List<string> output)
     {
         string strEntryPoint = iface.Name + '_' + func.Name;
         foreach (var attr in func.Attributes)
@@ -474,11 +514,11 @@ internal static class InterfacesGenerator
         // ── DllImport (not for GameServer re-exports) ────────────────────────────
         if (!bGameServerVersion)
         {
-            nativeMethods.Add($"\t[DllImport(NativeLibraryName, EntryPoint = \"SteamAPI_{strEntryPoint}\", CallingConvention = CallingConvention.Cdecl)]");
+            nativeMethods.Add(new($"\t[DllImport(NativeLibraryName, EntryPoint = \"SteamAPI_{strEntryPoint}\", CallingConvention = CallingConvention.Cdecl)]", strEntryPoint));
             if (returnType == "bool")
-                nativeMethods.Add("\t[return: MarshalAs(UnmanagedType.I1)]");
-            nativeMethods.Add($"\tpublic static extern {returnType} {strEntryPoint}({parsed.PInvokeArgs});");
-            nativeMethods.Add("");
+                nativeMethods.Add(new("\t[return: MarshalAs(UnmanagedType.I1)]", strEntryPoint));
+            nativeMethods.Add(new($"\tpublic static extern {returnType} {strEntryPoint}({parsed.PInvokeArgs});", strEntryPoint));
+            nativeMethods.Add(new("", strEntryPoint));
         }
 
         if (isClientInterface)
@@ -566,6 +606,7 @@ internal static class InterfacesGenerator
             }
         }
 
+        usedNatives.Add(nativeEntry);
         body.Add($"{indent}{strReturnable}{strCast}NativeMethods.{nativeEntry}({argNamesFinal});");
 
         if (parsed.OutStringArgs.Count > 0)
