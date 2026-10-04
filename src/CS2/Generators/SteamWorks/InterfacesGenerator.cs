@@ -309,9 +309,7 @@ internal static class InterfacesGenerator
         sb.Append(templateContent);
         foreach (var line in nativeMethods)
             sb.AppendLine(line);
-        sb.AppendLine("\t}");
         sb.AppendLine("}");
-        sb.AppendLine();
 
         await File.WriteAllTextAsync(Path.Combine(outputPath, "NativeMethods.cs"), sb.ToString(), Encoding.UTF8);
     }
@@ -476,10 +474,10 @@ internal static class InterfacesGenerator
         // ── DllImport (not for GameServer re-exports) ────────────────────────────
         if (!bGameServerVersion)
         {
-            nativeMethods.Add($"\t\t[DllImport(NativeLibraryName, EntryPoint = \"SteamAPI_{strEntryPoint}\", CallingConvention = CallingConvention.Cdecl)]");
+            nativeMethods.Add($"\t[DllImport(NativeLibraryName, EntryPoint = \"SteamAPI_{strEntryPoint}\", CallingConvention = CallingConvention.Cdecl)]");
             if (returnType == "bool")
-                nativeMethods.Add("\t\t[return: MarshalAs(UnmanagedType.I1)]");
-            nativeMethods.Add($"\t\tpublic static extern {returnType} {strEntryPoint}({parsed.PInvokeArgs});");
+                nativeMethods.Add("\t[return: MarshalAs(UnmanagedType.I1)]");
+            nativeMethods.Add($"\tpublic static extern {returnType} {strEntryPoint}({parsed.PInvokeArgs});");
             nativeMethods.Add("");
         }
 

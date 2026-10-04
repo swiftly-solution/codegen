@@ -24,7 +24,7 @@ internal static class TypedefsGenerator
         ["int64"]  = "long",
         ["uint32"] = "uint",
         ["uint64"] = "ulong",
-        ["void*"]  = "System.IntPtr",
+        ["void*"]  = "IntPtr",
     };
 
     private static readonly HashSet<string> UnusedTypedefs =
@@ -44,7 +44,7 @@ internal static class TypedefsGenerator
         ["HTTPRequestHandle"]            = new() { ["Invalid"] = "0" },
         ["SteamInventoryResult_t"]       = new() { ["Invalid"] = "-1" },
         ["SteamItemInstanceID_t"]        = new() { ["Invalid"] = "0xFFFFFFFFFFFFFFFF" },
-        ["HServerListRequest"]           = new() { ["Invalid"] = "System.IntPtr.Zero" },
+        ["HServerListRequest"]           = new() { ["Invalid"] = "IntPtr.Zero" },
         ["HServerQuery"]                 = new() { ["Invalid"] = "-1" },
         ["PublishedFileId_t"]            = new() { ["Invalid"] = "0" },
         ["PublishedFileUpdateHandle_t"]  = new() { ["Invalid"] = "0xffffffffffffffff" },
@@ -127,7 +127,7 @@ internal static class TypedefsGenerator
 
         var sb = new System.Text.StringBuilder();
         foreach (var (fieldName, value) in fields)
-            sb.AppendLine($"\t\tpublic static readonly {name} {fieldName} = new {name}({value});");
+            sb.AppendLine($"\tpublic static readonly {name} {fieldName} = new {name}({value});");
 
         return sb.ToString();
     }
@@ -139,11 +139,11 @@ internal static class TypedefsGenerator
 
         string result = template;
 
-        if (type == "System.IntPtr")
+        if (type == "IntPtr")
         {
-            result = result.Replace(", System.IComparable<{NAME}>", "", StringComparison.Ordinal);
+            result = result.Replace(", IComparable<{NAME}>", "", StringComparison.Ordinal);
             result = result.Replace(
-                "\n\t\tpublic int CompareTo({NAME} other) {\n\t\t\treturn m_{NAMESTRIPPED}.CompareTo(other.m_{NAMESTRIPPED});\n\t\t}\n",
+                "\n\tpublic int CompareTo({NAME} other)\n\t{\n\t\treturn m_{NAMESTRIPPED}.CompareTo(other.m_{NAMESTRIPPED});\n\t}\n",
                 "", StringComparison.Ordinal);
         }
 
