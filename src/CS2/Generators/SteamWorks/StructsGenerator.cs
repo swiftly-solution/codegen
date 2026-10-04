@@ -105,11 +105,10 @@ internal static class StructsGenerator
         var sb = new StringBuilder();
         sb.AppendLine("using System.Runtime.InteropServices;");
         sb.AppendLine();
-        sb.AppendLine("namespace SwiftlyS2.Shared.SteamAPI {");
-        foreach (var line in lines)
-            sb.AppendLine(line);
-        sb.AppendLine("}");
+        sb.AppendLine("namespace SwiftlyS2.Shared.SteamAPI;");
         sb.AppendLine();
+        foreach (var line in lines)
+            sb.AppendLine(line.StartsWith('\t') ? line[1..] : line);
         await File.WriteAllTextAsync(path, sb.ToString(), Encoding.UTF8);
     }
 
@@ -143,7 +142,8 @@ internal static class StructsGenerator
         if (SequentialStructs.Contains(s.Name))
             lines.Add("\t[StructLayout(LayoutKind.Sequential)]");
 
-        lines.Add($"\tpublic struct {s.Name} {{");
+        lines.Add($"\tpublic struct {s.Name}");
+        lines.Add("\t{");
         lines.AddRange(InsertConstructors(s.Name));
 
         if (s.CallbackId is { } cbId2)
@@ -237,7 +237,8 @@ internal static class StructsGenerator
 
         return
         [
-            "\t\tMatchMakingKeyValuePair_t(string strKey, string strValue) {",
+            "\t\tMatchMakingKeyValuePair_t(string strKey, string strValue)",
+            "\t\t{",
             "\t\t\tm_szKey = strKey;",
             "\t\t\tm_szValue = strValue;",
             "\t\t}",
