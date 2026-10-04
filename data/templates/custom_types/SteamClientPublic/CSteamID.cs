@@ -172,9 +172,6 @@ public struct CSteamID : IEquatable<CSteamID>, IComparable<CSteamID>
 	public CSteamID(AccountID_t unAccountID, uint unAccountInstance, EUniverse eUniverse, EAccountType eAccountType)
 	{
 		m_SteamID = 0;
-#if _SERVER && Assert
-		Assert( ! ( ( EAccountType.k_EAccountTypeIndividual == eAccountType ) && ( unAccountInstance > k_unSteamUserWebInstance ) ) );	// enforce that for individual accounts, instance is always 1
-#endif // _SERVER
 		InstancedSet(unAccountID, unAccountInstance, eUniverse, eAccountType);
 	}
 
