@@ -97,6 +97,15 @@ internal static class ConstantsGenerator
         "uint8", "int8", "uint16", "int32", "uint32", "int64", "uint64",
     ];
 
+    private static readonly Dictionary<string, string> ValueOverrides = new()
+    {
+        ["STEAMCLIENT_INTERFACE_VERSION"]          = "\"SteamClient023\"",
+        ["k_flMaxTimelineEventDuration"]           = "600",
+        ["k_nSteamNetworkingSend_UnreliableNoNagle"] = "k_nSteamNetworkingSend_Unreliable | k_nSteamNetworkingSend_NoNagle",
+        ["k_nSteamNetworkingSend_UnreliableNoDelay"] = "k_nSteamNetworkingSend_Unreliable | k_nSteamNetworkingSend_NoDelay | k_nSteamNetworkingSend_NoNagle",
+        ["k_nSteamNetworkingSend_ReliableNoNagle"]   = "k_nSteamNetworkingSend_Reliable | k_nSteamNetworkingSend_NoNagle",
+    };
+
     private static readonly Dictionary<string, (string Type, string? Value)> CustomDefines = new()
     {
         ["k_nMaxLobbyKeyLength"]                   = ("byte",  null),
@@ -149,7 +158,7 @@ internal static class ConstantsGenerator
                 var preComments = d.C?.PreComments ?? [];
 
                 var type = "int";
-                var value = d.Value;
+                var value = ValueOverrides.GetValueOrDefault(d.Name, d.Value);
 
                 if (CustomDefines.TryGetValue(d.Name, out var custom))
                 {
@@ -157,7 +166,7 @@ internal static class ConstantsGenerator
                     if (custom.Value is not null)
                         value = custom.Value;
                 }
-                else if (d.Value.StartsWith('"'))
+                else if (value.StartsWith('"'))
                 {
                     type = "string";
                     if (d.Name.StartsWith("STEAM", StringComparison.Ordinal))
@@ -167,7 +176,7 @@ internal static class ConstantsGenerator
                     }
                 }
 
-                value = NormalizeFloatLiteral(value);
+                value = ValueOverrides.ContainsKey(d.Name) ? value : NormalizeFloatLiteral(value);
                 defines.Add(new Constant(d.Name, value, type, preComments, comment, d.Spacing));
             }
         }
@@ -208,6 +217,7 @@ internal static class ConstantsGenerator
                     "0xffffffffffffffffull" => "0xffffffffffffffff",
                     var v                   => v
                 });
+                value = ValueOverrides.GetValueOrDefault(constant.Name, value);
 
                 result.Add(new Constant(constant.Name, value, type, preComments, comment, " "));
             }
