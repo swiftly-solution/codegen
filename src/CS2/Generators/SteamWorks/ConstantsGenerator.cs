@@ -109,19 +109,21 @@ internal static class ConstantsGenerator
         var constants = ParseConstants(parser);
 
         var sb = new StringBuilder();
-        sb.AppendLine("namespace SwiftlyS2.Shared.SteamAPI {");
-        sb.AppendLine("\tpublic static class Constants {");
+        sb.AppendLine("namespace SwiftlyS2.Shared.SteamAPI;");
+        sb.AppendLine();
+        sb.AppendLine("public static class Constants");
+        sb.AppendLine("{");
 
         foreach (var c in interfaceVersions.Concat(constants).Concat(defines))
         {
-            foreach (var pre in c.PreComments)
-                sb.AppendLine("\t\t//" + pre);
-            sb.AppendLine($"\t\tpublic const {c.Type} {c.Name}{c.Spacing}= {c.Value};{c.Comment}");
+            var doc = new List<string>();
+            XmlDocWriter.Write(doc, c.PreComments, c.LineComment, "\t");
+            foreach (var line in doc)
+                sb.AppendLine(line);
+            sb.AppendLine($"\tpublic const {c.Type} {c.Name}{c.Spacing}= {c.Value};");
         }
 
-        sb.AppendLine("\t}");
         sb.AppendLine("}");
-        sb.AppendLine();
 
         await File.WriteAllTextAsync(Path.Combine(outputPath, "SteamConstants.cs"), sb.ToString(), Encoding.UTF8);
     }
@@ -138,7 +140,7 @@ internal static class ConstantsGenerator
                 if (IsSkippedDefine(d.Name))
                     continue;
 
-                var comment = d.C?.LineComment is { } lc ? " //" + lc : "";
+                var comment = d.C?.LineComment;
                 var preComments = d.C?.PreComments ?? [];
 
                 var type = "int";
@@ -179,7 +181,7 @@ internal static class ConstantsGenerator
                 if (SkippedConstants.Contains(constant.Name))
                     continue;
 
-                var comment = constant.C?.LineComment is { } lc ? " //" + lc : "";
+                var comment = constant.C?.LineComment;
                 var preComments = constant.C?.PreComments ?? [];
 
                 var type = constant.Type;
@@ -221,5 +223,5 @@ internal static class ConstantsGenerator
 
     private sealed record Constant(
         string Name, string Value, string Type,
-        List<string> PreComments, string Comment, string Spacing);
+        List<string> PreComments, string? LineComment, string Spacing);
 }

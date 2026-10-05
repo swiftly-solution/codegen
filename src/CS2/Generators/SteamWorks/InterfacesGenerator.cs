@@ -373,11 +373,10 @@ internal static class InterfacesGenerator
             sb.AppendLine("#define STEAMNETWORKINGSOCKETS_ENABLE_SDR");
         sb.AppendLine("using System.Runtime.InteropServices;");
         sb.AppendLine();
-        sb.AppendLine("namespace SwiftlyS2.Shared.SteamAPI {");
-        foreach (var line in output)
-            sb.AppendLine(line);
-        sb.AppendLine("}");
+        sb.AppendLine("namespace SwiftlyS2.Shared.SteamAPI;");
         sb.AppendLine();
+        foreach (var line in output)
+            sb.AppendLine(line.StartsWith('\t') ? line[1..] : line);
 
         await File.WriteAllTextAsync(
             Path.Combine(outputPath, Path.GetFileNameWithoutExtension(f.Name) + ".cs"),
@@ -636,22 +635,7 @@ internal static class InterfacesGenerator
         if (parsed.StringArgs.Count > 0)
             body.Add("\t\t\t}");
 
-        // XML doc
-        var comments = new List<string>(func.Comments);
-        if (func.LineComment is { } lc && !string.IsNullOrEmpty(lc))
-            comments.Add(lc);
-
-        if (comments.Count > 0)
-        {
-            output.Add("\t\t/// <summary>");
-            foreach (var c in comments)
-            {
-                var esc = c.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;");
-                if (!string.IsNullOrEmpty(esc))
-                    output.Add($"\t\t/// <para>{esc}</para>");
-            }
-            output.Add("\t\t/// </summary>");
-        }
+        XmlDocWriter.Write(output, func.Comments, func.LineComment, "\t\t");
 
         string methodName = func.Name.TrimEnd('0');
         output.Add($"\t\tpublic static {wrapperReturnType} {methodName}({parsed.WrapperArgs}) {{");

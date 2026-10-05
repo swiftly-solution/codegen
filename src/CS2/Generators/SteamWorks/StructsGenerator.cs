@@ -121,7 +121,7 @@ internal static class StructsGenerator
 
         var lines = new List<string>();
 
-        WriteRawPreComments(lines, s.C?.RawPreComments, "\t", skipBlankLines: true);
+        XmlDocWriter.Write(lines, s.C, "\t");
 
         string packSize = CustomPackSize.GetValueOrDefault(s.Name, "Packsize.value");
         bool isExplicit = ExplicitStructs.ContainsKey(s.Name);
@@ -172,14 +172,7 @@ internal static class StructsGenerator
     {
         var lines = new List<string>();
 
-        if (field.C?.RawPreComments is { } preComments)
-        {
-            foreach (var preComment in preComments)
-            {
-                if (preComment is BlankLine)      lines.Add("\t\t");
-                else if (preComment is string sc) lines.Add("\t" + sc);
-            }
-        }
+        XmlDocWriter.Write(lines, field.C, "\t\t");
 
         string fieldType = TypeConversionDict.GetValueOrDefault(field.Type, field.Type);
         if (SpecialFieldTypes.TryGetValue(structName, out var specFields) && specFields.TryGetValue(field.Name, out var specType))
@@ -188,14 +181,12 @@ internal static class StructsGenerator
         if (ExplicitStructs.TryGetValue(structName, out var offsets) && offsets.TryGetValue(field.Name, out var offset))
             lines.Add($"\t\t[FieldOffset({offset})]");
 
-        string comment      = field.C?.RawLineComment ?? "";
         string constantsStr = "";
 
         if (field.ArraySize is not null)
         {
             constantsStr = (field.ArraySize.Length > 0 && field.ArraySize.All(char.IsDigit)) ? "" : "Constants.";
 
-            // Replicate Python's two independent if-chains exactly:
             if (fieldType == "byte[]")
                 lines.Add($"\t\t[MarshalAs(UnmanagedType.ByValArray, SizeConst = {constantsStr}{field.ArraySize})]");
 
@@ -214,7 +205,7 @@ internal static class StructsGenerator
         if (field.ArraySize is not null && fieldType == "string[]")
         {
             lines.Add($"\t\tprivate byte[] {field.Name}_;");
-            lines.Add($"\t\tpublic string {field.Name}{comment}");
+            lines.Add($"\t\tpublic string {field.Name}");
             lines.Add("\t\t{");
             lines.Add($"\t\t\tget {{ return InteropHelp.ByteArrayToStringUTF8({field.Name}_); }}");
             lines.Add($"\t\t\tset {{ InteropHelp.StringToByteArrayUTF8(value, {field.Name}_, {constantsStr}{field.ArraySize}); }}");
@@ -222,7 +213,7 @@ internal static class StructsGenerator
         }
         else
         {
-            lines.Add($"\t\tpublic {fieldType} {field.Name};{comment}");
+            lines.Add($"\t\tpublic {fieldType} {field.Name};");
         }
 
         return lines;

@@ -52,16 +52,17 @@ internal static class EnumsGenerator
                 if (SkippedEnums.TryGetValue(e.Name, out var skipFile) && skipFile == f.Name)
                     continue;
 
-                WriteRawPreComments(lines, e.C?.RawPreComments, indent: "\t", skipBlankLines: true);
+                XmlDocWriter.Write(lines, e.C, "\t");
 
                 if (FlagEnums.Contains(e.Name))
-                    lines.Add("\t[FlagsAttribute]");
+                    lines.Add("\t[Flags]");
 
-                lines.Add($"\tpublic enum {e.Name} : int {{");
+                lines.Add($"\tpublic enum {e.Name} : int");
+                lines.Add("\t{");
 
                 foreach (var field in e.Fields)
                 {
-                    WriteRawPreComments(lines, field.C?.RawPreComments, indent: "\t", skipBlankLines: false);
+                    XmlDocWriter.Write(lines, field.C, "\t\t");
 
                     var line = "\t\t" + field.Name;
 
@@ -77,9 +78,6 @@ internal static class EnumsGenerator
                         line += ApplyValueConversions(field.Value);
                     }
 
-                    if (field.C?.RawLineComment is { } rawLineComment)
-                        line += rawLineComment;
-
                     lines.Add(line);
                 }
 
@@ -91,13 +89,10 @@ internal static class EnumsGenerator
         }
 
         var sb = new StringBuilder();
-        sb.AppendLine("using Flags = System.FlagsAttribute;");
+        sb.AppendLine("namespace SwiftlyS2.Shared.SteamAPI;");
         sb.AppendLine();
-        sb.AppendLine("namespace SwiftlyS2.Shared.SteamAPI {");
         foreach (var line in lines)
-            sb.AppendLine(line);
-        sb.AppendLine("}");
-        sb.AppendLine();
+            sb.AppendLine(line.StartsWith('\t') ? line[1..] : line);
 
         await File.WriteAllTextAsync(Path.Combine(outputPath, "SteamEnums.cs"), sb.ToString(), Encoding.UTF8);
     }
