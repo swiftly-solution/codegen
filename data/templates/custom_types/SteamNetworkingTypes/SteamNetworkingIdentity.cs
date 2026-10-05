@@ -1,32 +1,47 @@
 namespace SwiftlyS2.Shared.SteamAPI;
 
-/// An abstract way to represent the identity of a network host.  All identities can
-/// be represented as simple string.  Furthermore, this string representation is actually
-/// used on the wire in several places, even though it is less efficient, in order to
-/// facilitate forward compatibility.  (Old client code can handle an identity type that
-/// it doesn't understand.)
+/// <summary>
+/// <para>An abstract way to represent the identity of a network host.  All identities can</para>
+/// <para>be represented as simple string.  Furthermore, this string representation is actually</para>
+/// <para>used on the wire in several places, even though it is less efficient, in order to</para>
+/// <para>facilitate forward compatibility.  (Old client code can handle an identity type that</para>
+/// <para>it doesn't understand.)</para>
+/// </summary>
 [Serializable]
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct SteamNetworkingIdentity : IEquatable<SteamNetworkingIdentity>
+public unsafe struct SteamNetworkingIdentity : IEquatable<SteamNetworkingIdentity>
 {
-	/// Type of identity.
+	/// <summary>
+	/// <para>Type of identity.</para>
+	/// </summary>
 	public ESteamNetworkingIdentityType m_eType;
 
-	//
-	// Internal representation.  Don't access this directly, use the accessors!
-	//
-	// Number of bytes that are relevant below.  This MUST ALWAYS be
-	// set.  (Use the accessors!)  This is important to enable old code to work
-	// with new identity types.
+	/// <summary>
+	/// <para>Internal representation.  Don't access this directly, use the accessors!</para>
+	/// <para>Number of bytes that are relevant below.  This MUST ALWAYS be</para>
+	/// <para>set.  (Use the accessors!)  This is important to enable old code to work</para>
+	/// <para>with new identity types.</para>
+	/// </summary>
 	private int m_cbSize;
 
-	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
-	private uint[] m_reserved; // Pad structure to leave easy room for future expansion
+	/// <summary>
+	/// <para>Pad structure to leave easy room for future expansion</para>
+	/// </summary>
+	private fixed uint m_reserved[32];
 
-	// Max sizes
-	public const int k_cchMaxString = 128; // Max length of the buffer needed to hold any identity, formatted in string format by ToString
-	public const int k_cchMaxGenericString = 32; // Max length of the string for generic string identities.  Including terminating '\0'
-	public const int k_cchMaxXboxPairwiseID = 33; // Including terminating '\0'
+	/// <summary>
+	/// <para>Max sizes</para>
+	/// <para>Max length of the buffer needed to hold any identity, formatted in string format by ToString</para>
+	/// </summary>
+	public const int k_cchMaxString = 128;
+	/// <summary>
+	/// <para>Max length of the string for generic string identities.  Including terminating '\0'</para>
+	/// </summary>
+	public const int k_cchMaxGenericString = 32;
+	/// <summary>
+	/// <para>Including terminating '\0'</para>
+	/// </summary>
+	public const int k_cchMaxXboxPairwiseID = 33;
 	public const int k_cbMaxGenericBytes = 32;
 
 	//
@@ -38,7 +53,9 @@ public struct SteamNetworkingIdentity : IEquatable<SteamNetworkingIdentity>
 		NativeMethods.SteamAPI_SteamNetworkingIdentity_Clear(ref this);
 	}
 
-	// Return true if we are the invalid type.  Does not make any other validity checks (e.g. is SteamID actually valid)
+	/// <summary>
+	/// <para>Return true if we are the invalid type.  Does not make any other validity checks (e.g. is SteamID actually valid)</para>
+	/// </summary>
 	public bool IsInvalid()
 	{
 		return NativeMethods.SteamAPI_SteamNetworkingIdentity_IsInvalid(ref this);
@@ -49,34 +66,41 @@ public struct SteamNetworkingIdentity : IEquatable<SteamNetworkingIdentity>
 		NativeMethods.SteamAPI_SteamNetworkingIdentity_SetSteamID(ref this, (ulong)steamID);
 	}
 
-	// Return black CSteamID (!IsValid()) if identity is not a SteamID
+	/// <summary>
+	/// <para>Return black CSteamID (!IsValid()) if identity is not a SteamID</para>
+	/// </summary>
 	public CSteamID GetSteamID()
 	{
 		return (CSteamID)NativeMethods.SteamAPI_SteamNetworkingIdentity_GetSteamID(ref this);
 	}
 
-	// Takes SteamID as raw 64-bit number
+	/// <summary>
+	/// <para>Takes SteamID as raw 64-bit number</para>
+	/// </summary>
 	public void SetSteamID64(ulong steamID)
 	{
 		NativeMethods.SteamAPI_SteamNetworkingIdentity_SetSteamID64(ref this, steamID);
 	}
 
-	// Returns 0 if identity is not SteamID
+	/// <summary>
+	/// <para>Returns 0 if identity is not SteamID</para>
+	/// </summary>
 	public ulong GetSteamID64()
 	{
 		return NativeMethods.SteamAPI_SteamNetworkingIdentity_GetSteamID64(ref this);
 	}
 
-	// Returns false if invalid length
+	/// <summary>
+	/// <para>Returns false if invalid length</para>
+	/// </summary>
 	public bool SetXboxPairwiseID(string pszString)
 	{
-		using (var pszString2 = new InteropHelp.UTF8StringHandle(pszString))
-		{
-			return NativeMethods.SteamAPI_SteamNetworkingIdentity_SetXboxPairwiseID(ref this, pszString2);
-		}
+		return NativeMethods.SteamAPI_SteamNetworkingIdentity_SetXboxPairwiseID(ref this, pszString);
 	}
 
-	// Returns nullptr if not Xbox ID
+	/// <summary>
+	/// <para>Returns nullptr if not Xbox ID</para>
+	/// </summary>
 	public string GetXboxPairwiseID()
 	{
 		return InteropHelp.PtrToStringUTF8(NativeMethods.SteamAPI_SteamNetworkingIdentity_GetXboxPairwiseID(ref this));
@@ -87,7 +111,9 @@ public struct SteamNetworkingIdentity : IEquatable<SteamNetworkingIdentity>
 		NativeMethods.SteamAPI_SteamNetworkingIdentity_SetPSNID(ref this, id);
 	}
 
-	// Returns 0 if not PSN
+	/// <summary>
+	/// <para>Returns 0 if not PSN</para>
+	/// </summary>
 	public ulong GetPSNID()
 	{
 		return NativeMethods.SteamAPI_SteamNetworkingIdentity_GetPSNID(ref this);
@@ -98,19 +124,25 @@ public struct SteamNetworkingIdentity : IEquatable<SteamNetworkingIdentity>
 		NativeMethods.SteamAPI_SteamNetworkingIdentity_SetStadiaID(ref this, id);
 	}
 
-	// Returns 0 if not Stadia
+	/// <summary>
+	/// <para>Returns 0 if not Stadia</para>
+	/// </summary>
 	public ulong GetStadiaID()
 	{
 		return NativeMethods.SteamAPI_SteamNetworkingIdentity_GetStadiaID(ref this);
 	}
 
-	// Set to specified IP:port
+	/// <summary>
+	/// <para>Set to specified IP:port</para>
+	/// </summary>
 	public void SetIPAddr(SteamNetworkingIPAddr addr)
 	{
 		NativeMethods.SteamAPI_SteamNetworkingIdentity_SetIPAddr(ref this, ref addr);
 	}
 
-	// returns null if we are not an IP address.
+	/// <summary>
+	/// <para>returns null if we are not an IP address.</para>
+	/// </summary>
 	public SteamNetworkingIPAddr GetIPAddr()
 	{
 		throw new NotImplementedException();
@@ -124,7 +156,9 @@ public struct SteamNetworkingIdentity : IEquatable<SteamNetworkingIdentity>
 		NativeMethods.SteamAPI_SteamNetworkingIdentity_SetIPv4Addr(ref this, nIPv4, nPort);
 	}
 
-	// returns 0 if we are not an IPv4 address.
+	/// <summary>
+	/// <para>returns 0 if we are not an IPv4 address.</para>
+	/// </summary>
 	public uint GetIPv4()
 	{
 		return NativeMethods.SteamAPI_SteamNetworkingIdentity_GetIPv4(ref this);
@@ -140,60 +174,72 @@ public struct SteamNetworkingIdentity : IEquatable<SteamNetworkingIdentity>
 		return GetFakeIPType() > ESteamNetworkingFakeIPType.k_ESteamNetworkingFakeIPType_NotFake;
 	}
 
-	// "localhost" is equivalent for many purposes to "anonymous."  Our remote
-	// will identify us by the network address we use.
-	// Set to localhost.  (We always use IPv6 ::1 for this, not 127.0.0.1)
+	/// <summary>
+	/// <para>"localhost" is equivalent for many purposes to "anonymous."  Our remote</para>
+	/// <para>will identify us by the network address we use.</para>
+	/// <para>Set to localhost.  (We always use IPv6 ::1 for this, not 127.0.0.1)</para>
+	/// </summary>
 	public void SetLocalHost()
 	{
 		NativeMethods.SteamAPI_SteamNetworkingIdentity_SetLocalHost(ref this);
 	}
 
-	// Return true if this identity is localhost.
+	/// <summary>
+	/// <para>Return true if this identity is localhost.</para>
+	/// </summary>
 	public bool IsLocalHost()
 	{
 		return NativeMethods.SteamAPI_SteamNetworkingIdentity_IsLocalHost(ref this);
 	}
 
-	// Returns false if invalid length
+	/// <summary>
+	/// <para>Returns false if invalid length</para>
+	/// </summary>
 	public bool SetGenericString(string pszString)
 	{
-		using (var pszString2 = new InteropHelp.UTF8StringHandle(pszString))
-		{
-			return NativeMethods.SteamAPI_SteamNetworkingIdentity_SetGenericString(ref this, pszString2);
-		}
+		return NativeMethods.SteamAPI_SteamNetworkingIdentity_SetGenericString(ref this, pszString);
 	}
 
-	// Returns nullptr if not generic string type
+	/// <summary>
+	/// <para>Returns nullptr if not generic string type</para>
+	/// </summary>
 	public string GetGenericString()
 	{
 		return InteropHelp.PtrToStringUTF8(NativeMethods.SteamAPI_SteamNetworkingIdentity_GetGenericString(ref this));
 	}
 
-	// Returns false if invalid size.
+	/// <summary>
+	/// <para>Returns false if invalid size.</para>
+	/// </summary>
 	public bool SetGenericBytes(byte[] data, uint cbLen)
 	{
 		return NativeMethods.SteamAPI_SteamNetworkingIdentity_SetGenericBytes(ref this, data, cbLen);
 	}
 
-	// Returns null if not generic bytes type
+	/// <summary>
+	/// <para>Returns null if not generic bytes type</para>
+	/// </summary>
 	public byte[] GetGenericBytes(out int cbLen)
 	{
 		throw new NotImplementedException();
 		//return NativeMethods.SteamAPI_SteamNetworkingIdentity_GetGenericBytes(ref this, out cbLen);
 	}
 
-	/// See if two identities are identical
+	/// <summary>
+	/// <para>See if two identities are identical</para>
+	/// </summary>
 	public bool Equals(SteamNetworkingIdentity x)
 	{
 		return NativeMethods.SteamAPI_SteamNetworkingIdentity_IsEqualTo(ref this, ref x);
 	}
 
-	/// Print to a human-readable string.  This is suitable for debug messages
-	/// or any other time you need to encode the identity as a string.  It has a
-	/// URL-like format (type:<type-data>).  Your buffer should be at least
-	/// k_cchMaxString bytes big to avoid truncation.
-	///
-	/// See also SteamNetworkingIPAddrRender
+	/// <summary>
+	/// <para>Print to a human-readable string.  This is suitable for debug messages</para>
+	/// <para>or any other time you need to encode the identity as a string.  It has a</para>
+	/// <para>URL-like format (type:&lt;type-data&gt;).  Your buffer should be at least</para>
+	/// <para>k_cchMaxString bytes big to avoid truncation.</para>
+	/// <para>See also SteamNetworkingIPAddrRender</para>
+	/// </summary>
 	public void ToString(out string buf)
 	{
 		IntPtr buf2 = Marshal.AllocHGlobal(k_cchMaxString);
@@ -202,16 +248,15 @@ public struct SteamNetworkingIdentity : IEquatable<SteamNetworkingIdentity>
 		Marshal.FreeHGlobal(buf2);
 	}
 
-	/// Parse back a string that was generated using ToString.  If we don't understand the
-	/// string, but it looks "reasonable" (it matches the pattern type:<type-data> and doesn't
-	/// have any funky characters, etc), then we will return true, and the type is set to
-	/// k_ESteamNetworkingIdentityType_UnknownType.  false will only be returned if the string
-	/// looks invalid.
+	/// <summary>
+	/// <para>Parse back a string that was generated using ToString.  If we don't understand the</para>
+	/// <para>string, but it looks "reasonable" (it matches the pattern type:&lt;type-data&gt; and doesn't</para>
+	/// <para>have any funky characters, etc), then we will return true, and the type is set to</para>
+	/// <para>k_ESteamNetworkingIdentityType_UnknownType.  false will only be returned if the string</para>
+	/// <para>looks invalid.</para>
+	/// </summary>
 	public bool ParseString(string pszStr)
 	{
-		using (var pszStr2 = new InteropHelp.UTF8StringHandle(pszStr))
-		{
-			return NativeMethods.SteamAPI_SteamNetworkingIdentity_ParseString(ref this, pszStr2);
-		}
+		return NativeMethods.SteamAPI_SteamNetworkingIdentity_ParseString(ref this, pszStr);
 	}
 }

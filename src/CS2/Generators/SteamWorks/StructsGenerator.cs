@@ -57,6 +57,7 @@ internal static class StructsGenerator
         "SteamNetworkingPOPIDRender",
         "SteamIPAddress_t",
         "SteamInputActionEvent_t",
+        "EncryptedAppTicketResponse_t",
     ];
 
     private static readonly HashSet<string> SequentialStructs =
@@ -103,7 +104,9 @@ internal static class StructsGenerator
     private static async Task WriteFile(string path, List<string> lines)
     {
         var sb = new StringBuilder();
+        sb.AppendLine("using System.Runtime.CompilerServices;");
         sb.AppendLine("using System.Runtime.InteropServices;");
+        sb.AppendLine("using System.Text;");
         sb.AppendLine();
         sb.AppendLine("namespace SwiftlyS2.Shared.SteamAPI;");
         sb.AppendLine();
@@ -142,7 +145,8 @@ internal static class StructsGenerator
         if (SequentialStructs.Contains(s.Name))
             lines.Add("\t[StructLayout(LayoutKind.Sequential)]");
 
-        lines.Add($"\tpublic struct {s.Name}");
+        bool needsUnsafe = s.Fields.Any(f => f.ArraySize is not null && IsFixedElement(ResolveFieldType(f, s.Name)));
+        lines.Add($"\tpublic {(needsUnsafe ? "unsafe " : "")}struct {s.Name}");
         lines.Add("\t{");
         lines.AddRange(InsertConstructors(s.Name));
 
@@ -174,52 +178,80 @@ internal static class StructsGenerator
 
         XmlDocWriter.Write(lines, field.C, "\t\t");
 
-        string fieldType = TypeConversionDict.GetValueOrDefault(field.Type, field.Type);
-        if (SpecialFieldTypes.TryGetValue(structName, out var specFields) && specFields.TryGetValue(field.Name, out var specType))
-            fieldType = specType;
+        string fieldType = ResolveFieldType(field, structName);
 
         if (ExplicitStructs.TryGetValue(structName, out var offsets) && offsets.TryGetValue(field.Name, out var offset))
             lines.Add($"\t\t[FieldOffset({offset})]");
 
-        string constantsStr = "";
-
         if (field.ArraySize is not null)
         {
-            constantsStr = (field.ArraySize.Length > 0 && field.ArraySize.All(char.IsDigit)) ? "" : "Constants.";
+            string size = ((field.ArraySize.Length > 0 && field.ArraySize.All(char.IsDigit)) ? "" : "Constants.") + field.ArraySize;
 
-            if (fieldType == "byte[]")
-                lines.Add($"\t\t[MarshalAs(UnmanagedType.ByValArray, SizeConst = {constantsStr}{field.ArraySize})]");
-
-            if (structName == "MatchMakingKeyValuePair_t")
-                lines.Add($"\t\t[MarshalAs(UnmanagedType.ByValTStr, SizeConst = {constantsStr}{field.ArraySize})]");
+            if (fieldType == "string")
+            {
+                lines.Add($"\t\tprivate fixed byte {field.Name}_[{size}];");
+                lines.Add($"\t\tpublic string {field.Name}");
+                lines.Add("\t\t{");
+                lines.Add("\t\t\tget");
+                lines.Add("\t\t\t{");
+                lines.Add($"\t\t\t\tfixed (byte* ptr = {field.Name}_)");
+                lines.Add("\t\t\t\t{");
+                lines.Add($"\t\t\t\t\tvar span = new ReadOnlySpan<byte>(ptr, {size});");
+                lines.Add("\t\t\t\t\tvar length = span.IndexOf((byte)0);");
+                lines.Add("\t\t\t\t\treturn Encoding.UTF8.GetString(length < 0 ? span : span[..length]);");
+                lines.Add("\t\t\t\t}");
+                lines.Add("\t\t\t}");
+                lines.Add("\t\t\tset");
+                lines.Add("\t\t\t{");
+                lines.Add($"\t\t\t\tfixed (byte* ptr = {field.Name}_)");
+                lines.Add("\t\t\t\t{");
+                lines.Add($"\t\t\t\t\tvar span = new Span<byte>(ptr, {size});");
+                lines.Add("\t\t\t\t\tspan.Clear();");
+                lines.Add("\t\t\t\t\tvar bytes = Encoding.UTF8.GetBytes(value ?? string.Empty);");
+                lines.Add($"\t\t\t\t\tbytes.AsSpan(0, Math.Min(bytes.Length, {size} - 1)).CopyTo(span);");
+                lines.Add("\t\t\t\t}");
+                lines.Add("\t\t\t}");
+                lines.Add("\t\t}");
+            }
+            else if (IsFixedElement(fieldType))
+            {
+                lines.Add($"\t\tpublic fixed {fieldType} {field.Name}[{size}];");
+            }
             else
             {
-                lines.Add($"\t\t[MarshalAs(UnmanagedType.ByValArray, SizeConst = {constantsStr}{field.ArraySize})]");
-                fieldType += "[]";
+                lines.Add($"\t\t[InlineArray({size})]");
+                lines.Add($"\t\tpublic struct {field.Name}Array");
+                lines.Add("\t\t{");
+                lines.Add($"\t\t\tprivate {fieldType} _element0;");
+                lines.Add("\t\t}");
+                lines.Add($"\t\tpublic {field.Name}Array {field.Name};");
             }
+
+            return lines;
         }
 
         if (fieldType == "bool")
             lines.Add("\t\t[MarshalAs(UnmanagedType.I1)]");
 
-        if (field.ArraySize is not null && fieldType == "string[]")
-        {
-            lines.Add($"\t\tprivate byte[] {field.Name}_;");
-            lines.Add($"\t\tpublic string {field.Name}");
-            lines.Add("\t\t{");
-            lines.Add($"\t\t\tget {{ return InteropHelp.ByteArrayToStringUTF8({field.Name}_); }}");
-            lines.Add($"\t\t\tset {{ InteropHelp.StringToByteArrayUTF8(value, {field.Name}_, {constantsStr}{field.ArraySize}); }}");
-            lines.Add("\t\t}");
-        }
-        else
-        {
-            lines.Add($"\t\tpublic {fieldType} {field.Name};");
-        }
+        lines.Add($"\t\tpublic {fieldType} {field.Name};");
 
         return lines;
     }
 
     // ─── Helpers ──────────────────────────────────────────────────────────────────
+
+    private static readonly HashSet<string> FixedElementTypes =
+        ["bool", "byte", "sbyte", "short", "ushort", "int", "uint", "long", "ulong", "float", "double", "char"];
+
+    private static bool IsFixedElement(string type) => type == "string" || FixedElementTypes.Contains(type);
+
+    private static string ResolveFieldType(StructField field, string structName)
+    {
+        string fieldType = TypeConversionDict.GetValueOrDefault(field.Type, field.Type);
+        if (SpecialFieldTypes.TryGetValue(structName, out var specFields) && specFields.TryGetValue(field.Name, out var specType))
+            fieldType = specType;
+        return fieldType;
+    }
 
     private static List<string> InsertConstructors(string name)
     {

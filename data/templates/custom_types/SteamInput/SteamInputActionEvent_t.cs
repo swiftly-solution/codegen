@@ -1,9 +1,9 @@
 namespace SwiftlyS2.Shared.SteamAPI;
 
-//-----------------------------------------------------------------------------
-// Purpose: when callbacks are enabled this fires each time a controller action
-// state changes
-//-----------------------------------------------------------------------------
+/// <summary>
+/// <para>when callbacks are enabled this fires each time a controller action</para>
+/// <para>state changes</para>
+/// </summary>
 [Serializable]
 [StructLayout(LayoutKind.Sequential)]
 public struct SteamInputActionEvent_t
@@ -12,7 +12,9 @@ public struct SteamInputActionEvent_t
 
 	public ESteamInputActionEventType eEventType;
 
-	/// Option value
+	/// <summary>
+	/// <para>Option value</para>
+	/// </summary>
 	public OptionValue m_val;
 
 	[Serializable]

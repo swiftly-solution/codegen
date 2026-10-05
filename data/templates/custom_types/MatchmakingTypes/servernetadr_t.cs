@@ -1,11 +1,16 @@
 namespace SwiftlyS2.Shared.SteamAPI;
 
-// servernetadr_t is all the addressing info the serverbrowser needs to know about a game server,
-// namely: its IP, its connection port, and its query port.
+/// <summary>
+/// <para>servernetadr_t is all the addressing info the serverbrowser needs to know about a game server,</para>
+/// <para>namely: its IP, its connection port, and its query port.</para>
+/// </summary>
 [Serializable]
 public struct servernetadr_t
 {
-	private ushort m_usConnectionPort;  // (in HOST byte order)
+	/// <summary>
+	/// <para>(in HOST byte order)</para>
+	/// </summary>
+	private ushort m_usConnectionPort;
 	private ushort m_usQueryPort;
 	private uint m_unIP;
 
@@ -22,7 +27,9 @@ public struct servernetadr_t
 	}
 #endif
 
-	// Access the query port.
+	/// <summary>
+	/// <para>Access the query port.</para>
+	/// </summary>
 	public ushort GetQueryPort()
 	{
 		return m_usQueryPort;
@@ -33,7 +40,9 @@ public struct servernetadr_t
 		m_usQueryPort = usPort;
 	}
 
-	// Access the connection port.
+	/// <summary>
+	/// <para>Access the connection port.</para>
+	/// </summary>
 	public ushort GetConnectionPort()
 	{
 		return m_usConnectionPort;
@@ -44,7 +53,9 @@ public struct servernetadr_t
 		m_usConnectionPort = usPort;
 	}
 
-	// Access the IP
+	/// <summary>
+	/// <para>Access the IP</para>
+	/// </summary>
 	public uint GetIP()
 	{
 		return m_unIP;
@@ -55,7 +66,9 @@ public struct servernetadr_t
 		m_unIP = unIP;
 	}
 
-	// This gets the 'a.b.c.d:port' string with the connection port (instead of the query port).
+	/// <summary>
+	/// <para>This gets the 'a.b.c.d:port' string with the connection port (instead of the query port).</para>
+	/// </summary>
 	public string GetConnectionAddressString()
 	{
 		return ToString(m_unIP, m_usConnectionPort);

@@ -65,6 +65,7 @@ internal static class ConstantsGenerator
     private static readonly HashSet<string> SkippedConstants =
     [
         "k_FriendsGroupID_Invalid",
+        "k_nSteamEncryptedAppTicketSymmetricKeyLen",
         "INVALID_HTMLBROWSER",
         "k_SteamItemInstanceIDInvalid",
         "k_SteamInventoryResultInvalid",

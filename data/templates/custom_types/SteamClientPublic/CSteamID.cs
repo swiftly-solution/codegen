@@ -230,67 +230,67 @@ public struct CSteamID : IEquatable<CSteamID>, IComparable<CSteamID>
 		SetAccountInstance(0);
 	}
 
-	//-----------------------------------------------------------------------------
-	// Purpose: Is this an anonymous game server login that will be filled in?
-	//-----------------------------------------------------------------------------
+	/// <summary>
+	/// <para>Is this an anonymous game server login that will be filled in?</para>
+	/// </summary>
 	public bool BBlankAnonAccount()
 	{
 		return GetAccountID() == new AccountID_t(0) && BAnonAccount() && GetUnAccountInstance() == 0;
 	}
 
-	//-----------------------------------------------------------------------------
-	// Purpose: Is this a game server account id?  (Either persistent or anonymous)
-	//-----------------------------------------------------------------------------
+	/// <summary>
+	/// <para>Is this a game server account id?  (Either persistent or anonymous)</para>
+	/// </summary>
 	public bool BGameServerAccount()
 	{
 		return GetEAccountType() == EAccountType.k_EAccountTypeGameServer || GetEAccountType() == EAccountType.k_EAccountTypeAnonGameServer;
 	}
 
-	//-----------------------------------------------------------------------------
-	// Purpose: Is this a persistent (not anonymous) game server account id?
-	//-----------------------------------------------------------------------------
+	/// <summary>
+	/// <para>Is this a persistent (not anonymous) game server account id?</para>
+	/// </summary>
 	public bool BPersistentGameServerAccount()
 	{
 		return GetEAccountType() == EAccountType.k_EAccountTypeGameServer;
 	}
 
-	//-----------------------------------------------------------------------------
-	// Purpose: Is this an anonymous game server account id?
-	//-----------------------------------------------------------------------------
+	/// <summary>
+	/// <para>Is this an anonymous game server account id?</para>
+	/// </summary>
 	public bool BAnonGameServerAccount()
 	{
 		return GetEAccountType() == EAccountType.k_EAccountTypeAnonGameServer;
 	}
 
-	//-----------------------------------------------------------------------------
-	// Purpose: Is this a content server account id?
-	//-----------------------------------------------------------------------------
+	/// <summary>
+	/// <para>Is this a content server account id?</para>
+	/// </summary>
 	public bool BContentServerAccount()
 	{
 		return GetEAccountType() == EAccountType.k_EAccountTypeContentServer;
 	}
 
 
-	//-----------------------------------------------------------------------------
-	// Purpose: Is this a clan account id?
-	//-----------------------------------------------------------------------------
+	/// <summary>
+	/// <para>Is this a clan account id?</para>
+	/// </summary>
 	public bool BClanAccount()
 	{
 		return GetEAccountType() == EAccountType.k_EAccountTypeClan;
 	}
 
 
-	//-----------------------------------------------------------------------------
-	// Purpose: Is this a chat account id?
-	//-----------------------------------------------------------------------------
+	/// <summary>
+	/// <para>Is this a chat account id?</para>
+	/// </summary>
 	public bool BChatAccount()
 	{
 		return GetEAccountType() == EAccountType.k_EAccountTypeChat;
 	}
 
-	//-----------------------------------------------------------------------------
-	// Purpose: Is this a chat account id?
-	//-----------------------------------------------------------------------------
+	/// <summary>
+	/// <para>Is this a chat account id?</para>
+	/// </summary>
 	public bool IsLobby()
 	{
 		return (GetEAccountType() == EAccountType.k_EAccountTypeChat)
@@ -298,34 +298,34 @@ public struct CSteamID : IEquatable<CSteamID>, IComparable<CSteamID>
 	}
 
 
-	//-----------------------------------------------------------------------------
-	// Purpose: Is this an individual user account id?
-	//-----------------------------------------------------------------------------
+	/// <summary>
+	/// <para>Is this an individual user account id?</para>
+	/// </summary>
 	public bool BIndividualAccount()
 	{
 		return GetEAccountType() == EAccountType.k_EAccountTypeIndividual || GetEAccountType() == EAccountType.k_EAccountTypeConsoleUser;
 	}
 
 
-	//-----------------------------------------------------------------------------
-	// Purpose: Is this an anonymous account?
-	//-----------------------------------------------------------------------------
+	/// <summary>
+	/// <para>Is this an anonymous account?</para>
+	/// </summary>
 	public bool BAnonAccount()
 	{
 		return GetEAccountType() == EAccountType.k_EAccountTypeAnonUser || GetEAccountType() == EAccountType.k_EAccountTypeAnonGameServer;
 	}
 
-	//-----------------------------------------------------------------------------
-	// Purpose: Is this an anonymous user account? ( used to create an account or reset a password )
-	//-----------------------------------------------------------------------------
+	/// <summary>
+	/// <para>Is this an anonymous user account? ( used to create an account or reset a password )</para>
+	/// </summary>
 	public bool BAnonUserAccount()
 	{
 		return GetEAccountType() == EAccountType.k_EAccountTypeAnonUser;
 	}
 
-	//-----------------------------------------------------------------------------
-	// Purpose: Is this a faked up Steam ID for a PSN friend account?
-	//-----------------------------------------------------------------------------
+	/// <summary>
+	/// <para>Is this a faked up Steam ID for a PSN friend account?</para>
+	/// </summary>
 	public bool BConsoleUserAccount()
 	{
 		return GetEAccountType() == EAccountType.k_EAccountTypeConsoleUser;
@@ -341,7 +341,9 @@ public struct CSteamID : IEquatable<CSteamID>, IComparable<CSteamID>
 		m_SteamID = (m_SteamID & ~(0xFFFFFul << (ushort)32)) | (((ulong)(other) & 0xFFFFFul) << (ushort)32);
 	}
 
-	// This is a non standard/custom function not found in C++ Steamworks
+	/// <summary>
+	/// <para>This is a non standard/custom function not found in C++ Steamworks</para>
+	/// </summary>
 	public void SetEAccountType(EAccountType other)
 	{
 		m_SteamID = (m_SteamID & ~(0xFul << (ushort)52)) | (((ulong)(other) & 0xFul) << (ushort)52);

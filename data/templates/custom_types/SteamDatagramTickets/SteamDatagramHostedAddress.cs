@@ -1,25 +1,33 @@
 namespace SwiftlyS2.Shared.SteamAPI;
 
-/// Network-routable identifier for a service.  This is an intentionally
-/// opaque byte blob.  The relays know how to use this to forward it on
-/// to the intended destination, but otherwise clients really should not
-/// need to know what's inside.  (Indeed, we don't really want them to
-/// know, as it could reveal information useful to an attacker.)
+/// <summary>
+/// <para>Network-routable identifier for a service.  This is an intentionally</para>
+/// <para>opaque byte blob.  The relays know how to use this to forward it on</para>
+/// <para>to the intended destination, but otherwise clients really should not</para>
+/// <para>need to know what's inside.  (Indeed, we don't really want them to</para>
+/// <para>know, as it could reveal information useful to an attacker.)</para>
+/// </summary>
 [Serializable]
 [StructLayout(LayoutKind.Sequential, Pack = Packsize.value)]
-public struct SteamDatagramHostedAddress
+public unsafe struct SteamDatagramHostedAddress
 {
-	// Size of data blob.
+	/// <summary>
+	/// <para>Size of data blob.</para>
+	/// </summary>
 	public int m_cbSize;
 
-	// Opaque
-	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 128)]
-	public byte[] m_data;
+	/// <summary>
+	/// <para>Opaque</para>
+	/// </summary>
+	public fixed byte m_data[128];
 
-	// Reset to empty state
+	/// <summary>
+	/// <para>Reset to empty state</para>
+	/// </summary>
 	public void Clear()
 	{
 		m_cbSize = 0;
-		m_data = new byte[128];
+		fixed (byte* data = m_data)
+			new Span<byte>(data, 128).Clear();
 	}
 }

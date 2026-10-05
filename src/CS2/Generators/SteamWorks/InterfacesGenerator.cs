@@ -33,8 +33,8 @@ internal static class InterfacesGenerator
         ["char*"]                              = "IntPtr",
         ["char *"]                             = "IntPtr",
         ["char **"]                            = "out IntPtr",
-        ["const char*"]                        = "InteropHelp.UTF8StringHandle",
-        ["const char *"]                       = "InteropHelp.UTF8StringHandle",
+        ["const char*"]                        = "string",
+        ["const char *"]                       = "string",
         ["const void *"]                       = "IntPtr",
         ["unsigned short"]                     = "ushort",
         ["void *"]                             = "IntPtr",
@@ -179,8 +179,6 @@ internal static class InterfacesGenerator
         ["ISteamUser_DecompressVoice"]     = new() { ["pCompressed"] = "byte[]", ["pDestBuffer"] = "byte[]" },
         ["ISteamUser_GetAuthSessionTicket"]= new() { ["pTicket"] = "byte[]" },
         ["ISteamUser_BeginAuthSession"]    = new() { ["pAuthTicket"] = "byte[]" },
-        ["ISteamUser_RequestEncryptedAppTicket"] = new() { ["pDataToInclude"] = "byte[]" },
-        ["ISteamUser_GetEncryptedAppTicket"]     = new() { ["pTicket"] = "byte[]" },
         ["ISteamUserStats_GetDownloadedLeaderboardEntry"] = new() { ["pDetails"] = "int[]" },
         ["ISteamUserStats_UploadLeaderboardScore"]        = new() { ["pScoreDetails"] = "int[]" },
         ["ISteamUtils_GetImageRGBA"]       = new() { ["pubDest"] = "byte[]" },
@@ -311,13 +309,10 @@ internal static class InterfacesGenerator
 
         string templateContent = await File.ReadAllTextAsync(Path.Combine(templatesPath, "nativemethods.txt"));
 
-        var sb = new StringBuilder();
-        sb.Append(templateContent);
-        foreach (var line in PruneNativeMethods(nativeMethods, usedNatives))
-            sb.AppendLine(line);
-        sb.AppendLine("}");
+        var declarations = templateContent.ReplaceLineEndings("\n").Split('\n').Concat(PruneNativeMethods(nativeMethods, usedNatives));
 
-        await File.WriteAllTextAsync(Path.Combine(outputPath, "NativeMethods.cs"), sb.ToString(), Encoding.UTF8);
+        NativeBindingsGenerator.Configure(parser);
+        await NativeBindingsGenerator.GenerateAsync(declarations, outputPath);
     }
 
     private static List<string> PruneNativeMethods(List<NativeLine> lines, HashSet<string> used)
@@ -581,13 +576,6 @@ internal static class InterfacesGenerator
         }
 
         string indent = "\t\t\t";
-        if (parsed.StringArgs.Count > 0)
-        {
-            indent += "\t";
-            foreach (var a in parsed.StringArgs)
-                body.Add($"\t\t\tusing (var {a}2 = new InteropHelp.UTF8StringHandle({a}))");
-            body[^1] += " {";
-        }
 
         // Native call entry point (GameServer re-exports strip "GameServer")
         string nativeEntry = bGameServerVersion
@@ -631,9 +619,6 @@ internal static class InterfacesGenerator
             if (returnType != "void")
                 body.Add($"{indent}return ret;");
         }
-
-        if (parsed.StringArgs.Count > 0)
-            body.Add("\t\t\t}");
 
         XmlDocWriter.Write(output, func.Comments, func.LineComment, "\t\t");
 
@@ -728,9 +713,7 @@ internal static class InterfacesGenerator
                 && specWrapper.TryGetValue(arg.Name, out var specWrapperType))
                 wrapperType = specWrapperType;
 
-            if (wrapperType == "InteropHelp.UTF8StringHandle")
-                wrapperType = "string";
-            else if (arg.Type is "char *" or "char*")
+            if (arg.Type is "char *" or "char*")
                 wrapperType = "out string";
 
             if (!arg.Name.EndsWith("Deprecated"))
@@ -767,7 +750,6 @@ internal static class InterfacesGenerator
             if (wrapperType == "string")
             {
                 stringArgs.Add(arg.Name);
-                argNames += "2";
             }
             else if (wrapperType == "out string")
             {

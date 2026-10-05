@@ -1,2 +1,0 @@
-- [ ] Docs Generator
-- [ ] SteamWorks Generator
