@@ -245,12 +245,14 @@ internal static class NativeBindingsGenerator
             string type = rawType
                 .Replace("[In, Out] ", "", StringComparison.Ordinal)
                 .Replace("[MarshalAs(UnmanagedType.I1)] ", "", StringComparison.Ordinal);
+            string sigType = type;
+            type = type.TrimEnd('?');
 
             string mod = "";
             if (type.StartsWith("out ", StringComparison.Ordinal)) { mod = "out "; type = type[4..]; }
             else if (type.StartsWith("ref ", StringComparison.Ordinal)) { mod = "ref "; type = type[4..]; }
 
-            sig.Add($"{mod}{type} {name}");
+            sig.Add($"{sigType} {name}");
 
             if (type == "string" && mod == "")
             {

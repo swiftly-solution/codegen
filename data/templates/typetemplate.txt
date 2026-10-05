@@ -16,7 +16,7 @@ public struct {NAME} : IEquatable<{NAME}>, IComparable<{NAME}>
 		return m_{NAMESTRIPPED}.ToString();
 	}
 
-	public override bool Equals(object other)
+	public override bool Equals(object? other)
 	{
 		return other is {NAME} && this == ({NAME})other;
 	}

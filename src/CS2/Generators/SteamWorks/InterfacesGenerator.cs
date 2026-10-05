@@ -616,6 +616,11 @@ internal static class InterfacesGenerator
 
     // ─── Args ─────────────────────────────────────────────────────────────────────
 
+    private static string NullableSignature(string type) =>
+        type is "string" or "out string" || type.EndsWith("[]") || type == "IList<string>"
+            ? type + "?"
+            : type;
+
     private static ParsedArgs ParseArgs(string strEntryPoint, List<Arg> args, List<Typedef> typedefs)
     {
         // Context pointer as first real argument
@@ -683,6 +688,9 @@ internal static class InterfacesGenerator
                     ? "[MarshalAs(UnmanagedType.I1)] " + argType
                     : argType;
 
+            if (pinvokeType.EndsWith("[]") || pinvokeType == "string")
+                pinvokeType += "?";
+
             pinvokeArgs += pinvokeType + " " + arg.Name + ", ";
 
             string cleanType = argType
@@ -700,7 +708,7 @@ internal static class InterfacesGenerator
 
             if (!arg.Name.EndsWith("Deprecated"))
             {
-                wrapperArgs += wrapperType + " " + arg.Name;
+                wrapperArgs += NullableSignature(wrapperType) + " " + arg.Name;
                 if (arg.Default is { } def)
                     wrapperArgs += " = " + ArgDefaultLookup.GetValueOrDefault(def, def);
                 wrapperArgs += ", ";

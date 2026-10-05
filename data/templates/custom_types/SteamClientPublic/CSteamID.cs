@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
 namespace SwiftlyS2.Shared.SteamAPI;
@@ -106,7 +105,7 @@ public partial class SteamIdParser
 		return steamId64 >= STEAM_ID_BASE;
 	}
 
-	public static string ToSteamId(ulong steamId64)
+	public static string? ToSteamId(ulong steamId64)
 	{
 		if (!IsValidSteamId64(steamId64))
 			return null;
@@ -118,7 +117,7 @@ public partial class SteamIdParser
 		return $"STEAM_0:{y}:{z}";
 	}
 
-	public static string ToSteamId3(ulong steamId64)
+	public static string? ToSteamId3(ulong steamId64)
 	{
 		if (!IsValidSteamId64(steamId64))
 			return null;
@@ -127,7 +126,7 @@ public partial class SteamIdParser
 		return $"[U:1:{accountId}]";
 	}
 
-	public static string ToSteamIdOnline(ulong steamId64)
+	public static string? ToSteamIdOnline(ulong steamId64)
 	{
 		if (!IsValidSteamId64(steamId64))
 			return null;
@@ -409,12 +408,12 @@ public struct CSteamID : IEquatable<CSteamID>, IComparable<CSteamID>
 		return m_SteamID;
 	}
 
-	public string GetSteamID()
+	public string? GetSteamID()
 	{
 		return SteamIdParser.ToSteamId(m_SteamID);
 	}
 
-	public string GetSteamID3()
+	public string? GetSteamID3()
 	{
 		return SteamIdParser.ToSteamId3(m_SteamID);
 	}
@@ -424,7 +423,7 @@ public struct CSteamID : IEquatable<CSteamID>, IComparable<CSteamID>
 		return GetAccountID().m_AccountID;
 	}
 
-	public string GetSteamIDOnline()
+	public string? GetSteamIDOnline()
 	{
 		return SteamIdParser.ToSteamIdOnline(m_SteamID);
 	}
@@ -435,7 +434,7 @@ public struct CSteamID : IEquatable<CSteamID>, IComparable<CSteamID>
 		return m_SteamID.ToString();
 	}
 
-	public override bool Equals(object other)
+	public override bool Equals(object? other)
 	{
 		return other is CSteamID && this == (CSteamID)other;
 	}

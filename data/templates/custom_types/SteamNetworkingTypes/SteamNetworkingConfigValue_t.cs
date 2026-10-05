@@ -43,10 +43,10 @@ public struct SteamNetworkingConfigValue_t
 		[FieldOffset(0)]
 		public float m_float;
 
-		[FieldOffset(0)]
 		/// <summary>
 		/// <para>Points to your '\0'-terminated buffer</para>
 		/// </summary>
+		[FieldOffset(0)]
 		public IntPtr m_string;
 
 		[FieldOffset(0)]

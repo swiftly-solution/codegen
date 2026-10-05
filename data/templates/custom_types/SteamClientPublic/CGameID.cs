@@ -118,7 +118,7 @@ public struct CGameID : IEquatable<CGameID>, IComparable<CGameID>
 		return m_GameID.ToString();
 	}
 
-	public override bool Equals(object other)
+	public override bool Equals(object? other)
 	{
 		return other is CGameID && this == (CGameID)other;
 	}
