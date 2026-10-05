@@ -29,6 +29,8 @@ public class Natives : BaseGenerator
         { "cutlstringtoken", "CUtlStringToken" }
     };
 
+    private static readonly HashSet<string> PointerPassedTypes = ["vector2", "vector", "vector4", "qangle", "color"];
+
     private static readonly Dictionary<string, string> DelegateParamTypeMap;
     private static readonly Dictionary<string, string> DelegateReturnTypeMap;
     private static readonly Dictionary<string, string> ReturnTypeMap;
@@ -42,12 +44,22 @@ public class Natives : BaseGenerator
             ["bool"] = "byte"
         };
 
+        foreach (var type in PointerPassedTypes)
+        {
+            DelegateParamTypeMap[type] = $"{ParamTypeMap[type]}*";
+        }
+
         DelegateReturnTypeMap = new Dictionary<string, string>(ParamTypeMap)
         {
             ["string"] = "byte*",
             ["bytes"] = "int",
             ["bool"] = "byte"
         };
+
+        foreach (var type in PointerPassedTypes)
+        {
+            DelegateReturnTypeMap[type] = "void";
+        }
 
         ReturnTypeMap = new Dictionary<string, string>(ParamTypeMap)
         {
@@ -209,6 +221,10 @@ public class Natives : BaseGenerator
         {
             delegateParamTypes = new[] { "byte*" }.Concat(nativeParamTypes).ToList();
         }
+        else if (PointerPassedTypes.Contains(returnType))
+        {
+            delegateParamTypes = new[] { $"{ParamTypeMap[returnType]}*" }.Concat(nativeParamTypes).ToList();
+        }
         else
         {
             delegateParamTypes = nativeParamTypes;
@@ -322,6 +338,14 @@ public class Natives : BaseGenerator
                 writer.AddLine("return retBytes;");
             });
         }
+        else if (PointerPassedTypes.Contains(returnType))
+        {
+            var callArgs = new List<string> { "&returnValue" };
+            callArgs.AddRange(BuildCallArgs(nativeParams));
+            writer.AddLine($"{ParamTypeMap[returnType]} returnValue = default;");
+            writer.AddLine($"_{functionName}({string.Join(", ", callArgs)});");
+            writer.AddLine("return returnValue;");
+        }
         else
         {
             var callArgs = BuildCallArgs(nativeParams);
@@ -366,6 +390,10 @@ public class Natives : BaseGenerator
             else if (type == "bool")
             {
                 args.Add($"{name} ? (byte)1 : (byte)0");
+            }
+            else if (PointerPassedTypes.Contains(type))
+            {
+                args.Add($"&{name}");
             }
             else
             {
