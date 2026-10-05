@@ -60,11 +60,6 @@ internal static class StructsGenerator
         "EncryptedAppTicketResponse_t",
     ];
 
-    private static readonly HashSet<string> SequentialStructs =
-    [
-        "MatchMakingKeyValuePair_t",
-    ];
-
     private static readonly Dictionary<string, Dictionary<string, string>> SpecialFieldTypes = new()
     {
         ["PersonaStateChange_t"]   = new() { ["m_nChangeFlags"] = "EPersonaChange" },
@@ -142,13 +137,9 @@ internal static class StructsGenerator
         if (s.CallbackId is { } cbId)
             lines.Add($"\t[CallbackIdentity(Constants.{cbId})]");
 
-        if (SequentialStructs.Contains(s.Name))
-            lines.Add("\t[StructLayout(LayoutKind.Sequential)]");
-
         bool needsUnsafe = s.Fields.Any(f => f.ArraySize is not null && IsFixedElement(ResolveFieldType(f, s.Name)));
         lines.Add($"\tpublic {(needsUnsafe ? "unsafe " : "")}struct {s.Name}");
         lines.Add("\t{");
-        lines.AddRange(InsertConstructors(s.Name));
 
         if (s.CallbackId is { } cbId2)
             lines.Add($"\t\tpublic const int k_iCallback = Constants.{cbId2};");
@@ -251,22 +242,6 @@ internal static class StructsGenerator
         if (SpecialFieldTypes.TryGetValue(structName, out var specFields) && specFields.TryGetValue(field.Name, out var specType))
             fieldType = specType;
         return fieldType;
-    }
-
-    private static List<string> InsertConstructors(string name)
-    {
-        if (name != "MatchMakingKeyValuePair_t")
-            return [];
-
-        return
-        [
-            "\t\tMatchMakingKeyValuePair_t(string strKey, string strValue)",
-            "\t\t{",
-            "\t\t\tm_szKey = strKey;",
-            "\t\t\tm_szValue = strValue;",
-            "\t\t}",
-            "",
-        ];
     }
 
     private static void WriteRawPreComments(List<string> lines, List<object>? rawComments, string indent, bool skipBlankLines)

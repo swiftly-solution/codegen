@@ -57,10 +57,6 @@ internal static class InterfacesGenerator
         ["const SteamItemDef_t"]               = "SteamItemDef_t",
         ["SteamParamStringArray_t *"]          = "IntPtr",
         ["const SteamParamStringArray_t *"]    = "IntPtr",
-        ["ISteamMatchmakingServerListResponse *"] = "IntPtr",
-        ["ISteamMatchmakingPingResponse *"]    = "IntPtr",
-        ["ISteamMatchmakingPlayersResponse *"] = "IntPtr",
-        ["ISteamMatchmakingRulesResponse *"]   = "IntPtr",
         ["ControllerAnalogActionData_t"]       = "InputAnalogActionData_t",
         ["ControllerDigitalActionData_t"]      = "InputDigitalActionData_t",
         ["ControllerMotionData_t"]             = "InputMotionData_t",
@@ -81,13 +77,8 @@ internal static class InterfacesGenerator
 
     private static readonly Dictionary<string, string> WrapperArgsTypeDict = new()
     {
-        ["SteamParamStringArray_t *"]          = "System.Collections.Generic.IList<string>",
-        ["const SteamParamStringArray_t *"]    = "System.Collections.Generic.IList<string>",
-        ["ISteamMatchmakingServerListResponse *"] = "ISteamMatchmakingServerListResponse",
-        ["ISteamMatchmakingPingResponse *"]    = "ISteamMatchmakingPingResponse",
-        ["ISteamMatchmakingPlayersResponse *"] = "ISteamMatchmakingPlayersResponse",
-        ["ISteamMatchmakingRulesResponse *"]   = "ISteamMatchmakingRulesResponse",
-        ["MatchMakingKeyValuePair_t **"]       = "MatchMakingKeyValuePair_t[]",
+        ["SteamParamStringArray_t *"]          = "IList<string>",
+        ["const SteamParamStringArray_t *"]    = "IList<string>",
         ["char **"]                            = "out string",
     };
 
@@ -95,7 +86,6 @@ internal static class InterfacesGenerator
     {
         ["const char *"]          = "IntPtr",
         ["CSteamID"]              = "ulong",
-        ["gameserveritem_t *"]    = "IntPtr",
         ["SteamNetworkingMessage_t *"] = "IntPtr",
         ["ISteamAppList *"]       = "IntPtr",
         ["ISteamApps *"]          = "IntPtr",
@@ -108,8 +98,6 @@ internal static class InterfacesGenerator
         ["ISteamHTTP *"]          = "IntPtr",
         ["ISteamInput *"]         = "IntPtr",
         ["ISteamInventory *"]     = "IntPtr",
-        ["ISteamMatchmaking *"]   = "IntPtr",
-        ["ISteamMatchmakingServers *"] = "IntPtr",
         ["ISteamMusic *"]         = "IntPtr",
         ["ISteamMusicRemote *"]   = "IntPtr",
         ["ISteamNetworking *"]    = "IntPtr",
@@ -147,8 +135,6 @@ internal static class InterfacesGenerator
         ["ISteamHTTP_SetHTTPRequestRawPostBody"]   = new() { ["pubBody"] = "byte[]" },
         ["ISteamInventory_SerializeResult"]        = new() { ["pOutBuffer"] = "byte[]" },
         ["ISteamInventory_DeserializeResult"]      = new() { ["pBuffer"] = "byte[]" },
-        ["ISteamMatchmaking_SendLobbyChatMsg"]     = new() { ["pvMsgBody"] = "byte[]" },
-        ["ISteamMatchmaking_GetLobbyChatEntry"]    = new() { ["pvData"] = "byte[]" },
         ["ISteamMusicRemote_SetPNGIcon_64x64"]     = new() { ["pvBuffer"] = "byte[]" },
         ["ISteamMusicRemote_UpdateCurrentEntryCoverArt"] = new() { ["pvBuffer"] = "byte[]" },
         ["ISteamNetworking_SendP2PPacket"]          = new() { ["pubData"] = "byte[]" },
@@ -367,6 +353,7 @@ internal static class InterfacesGenerator
         if (IsNetworkingFile(f.Name))
             sb.AppendLine("#define STEAMNETWORKINGSOCKETS_ENABLE_SDR");
         sb.AppendLine("using System.Runtime.InteropServices;");
+        sb.AppendLine("using SwiftlyS2.Core.Natives;");
         sb.AppendLine();
         sb.AppendLine("namespace SwiftlyS2.Shared.SteamAPI;");
         sb.AppendLine();
@@ -438,7 +425,7 @@ internal static class InterfacesGenerator
                 }
             }
 
-            if (func.Private)
+            if (func.Private || func.Name.Contains("Matchmaking", StringComparison.Ordinal))
                 continue;
 
             ParseFunc(f, iface, func, typedefs, isClientInterface, bGameServerVersion, nativeMethods, usedNatives, output);
@@ -541,14 +528,8 @@ internal static class InterfacesGenerator
         if (func.ReturnType is "const char *" or "const char*")
         {
             wrapperReturnType = "string";
-            strReturnable += "InteropHelp.PtrToStringUTF8(";
+            strReturnable += "StringAlloc.CreateCSharpString(";
             argNamesFinal += ")";
-        }
-        else if (func.ReturnType == "gameserveritem_t *")
-        {
-            wrapperReturnType = "gameserveritem_t";
-            strReturnable += "(gameserveritem_t)Marshal.PtrToStructure(";
-            argNamesFinal += "), typeof(gameserveritem_t)";
         }
         else if (func.ReturnType == "CSteamID")
         {
@@ -576,6 +557,10 @@ internal static class InterfacesGenerator
         }
 
         string indent = "\t\t\t";
+
+        // string lists become a native SteamParamStringArray_t that lives for the call
+        foreach (var a in parsed.StringListArgs)
+            body.Add($"\t\t\tusing var {a}Array = new SteamParamStringArray({a});");
 
         // Native call entry point (GameServer re-exports strip "GameServer")
         string nativeEntry = bGameServerVersion
@@ -608,9 +593,9 @@ internal static class InterfacesGenerator
             foreach (var a in parsed.OutStringArgs)
             {
                 if (returnType == "void")
-                    body.Add($"{indent}{a} = InteropHelp.PtrToStringUTF8({a}2);");
+                    body.Add($"{indent}{a} = StringAlloc.CreateCSharpString({a}2);");
                 else
-                    body.Add($"{indent}{a} = {retcmp} ? InteropHelp.PtrToStringUTF8({a}2) : null;");
+                    body.Add($"{indent}{a} = {retcmp} ? StringAlloc.CreateCSharpString({a}2) : null;");
 
                 if (strEntryPoint != "ISteamRemoteStorage_GetUGCDetails")
                     body.Add($"{indent}Marshal.FreeHGlobal({a}2);");
@@ -645,6 +630,7 @@ internal static class InterfacesGenerator
         string argNames = $"{ctx}.Get{ifaceName}(), ";
         var stringArgs    = new List<string>();
         var outStringArgs = new List<string>();
+        var stringListArgs = new List<string>();
         var outStringSize = new List<Arg>();
         var argsWithExplicitCount = new Dictionary<string, string>();
 
@@ -690,10 +676,6 @@ internal static class InterfacesGenerator
                 }
             }
 
-            // MatchMakingKeyValuePair_t ** hack
-            if (arg.Type == "MatchMakingKeyValuePair_t **")
-                argType = "IntPtr";
-
             // Marshal attributes for PInvoke
             string pinvokeType = argType.EndsWith("[]") && argType != "byte[]"
                 ? "[In, Out] " + argType
@@ -728,12 +710,11 @@ internal static class InterfacesGenerator
             if (cleanType.StartsWith("out"))      argNames += "out ";
             else if (wrapperType.StartsWith("ref")) argNames += "ref ";
 
-            if (wrapperType == "System.Collections.Generic.IList<string>")
-                argNames += $"new InteropHelp.SteamParamStringArray({arg.Name})";
-            else if (wrapperType == "MatchMakingKeyValuePair_t[]")
-                argNames += $"new MMKVPMarshaller({arg.Name})";
-            else if (wrapperType.EndsWith("Response"))
-                argNames += $"(IntPtr){arg.Name}";
+            if (wrapperType == "IList<string>")
+            {
+                stringListArgs.Add(arg.Name);
+                argNames += $"{arg.Name}Array";
+            }
             else if (arg.Name.EndsWith("Deprecated"))
                 argNames += cleanType == "IntPtr" ? "IntPtr.Zero" : cleanType == "bool" ? "false" : "0";
             else
@@ -767,11 +748,11 @@ internal static class InterfacesGenerator
             pinvokeArgs.TrimEnd(',', ' '),
             wrapperArgs.TrimEnd(',', ' '),
             argNames.TrimEnd(',', ' '),
-            stringArgs, outStringArgs, outStringSize, argsWithExplicitCount);
+            stringArgs, outStringArgs, outStringSize, argsWithExplicitCount, stringListArgs);
     }
 
     private sealed record ParsedArgs(
         string PInvokeArgs, string WrapperArgs, string ArgNames,
         List<string> StringArgs, List<string> OutStringArgs,
-        List<Arg> OutStringSize, Dictionary<string, string> ArgsWithExplicitCount);
+        List<Arg> OutStringSize, Dictionary<string, string> ArgsWithExplicitCount, List<string> StringListArgs);
 }

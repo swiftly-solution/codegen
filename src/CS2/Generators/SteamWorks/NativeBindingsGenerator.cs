@@ -16,9 +16,9 @@ internal static class NativeBindingsGenerator
 
     private static readonly HashSet<string> BlittableCustom =
     [
-        "CSteamID", "CGameID", "SteamIPAddress_t", "SteamNetworkingConfigValue_t", "servernetadr_t",
+        "CSteamID", "CGameID", "SteamIPAddress_t", "SteamNetworkingConfigValue_t",
         "SteamNetworkingIdentity", "SteamNetworkingIPAddr", "SteamNetworkingErrMsg", "SteamNetworkingMessage_t",
-        "SteamDatagramRelayAuthTicket", "SteamDatagramHostedAddress", "gameserveritem_t",
+        "SteamDatagramRelayAuthTicket", "SteamDatagramHostedAddress",
         "ISteamNetworkingConnectionSignaling", "ISteamNetworkingSignalingRecvContext",
     ];
 

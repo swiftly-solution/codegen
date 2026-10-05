@@ -103,7 +103,7 @@ public unsafe struct SteamNetworkingIdentity : IEquatable<SteamNetworkingIdentit
 	/// </summary>
 	public string GetXboxPairwiseID()
 	{
-		return InteropHelp.PtrToStringUTF8(NativeMethods.SteamAPI_SteamNetworkingIdentity_GetXboxPairwiseID(ref this));
+		return StringAlloc.CreateCSharpString(NativeMethods.SteamAPI_SteamNetworkingIdentity_GetXboxPairwiseID(ref this));
 	}
 
 	public void SetPSNID(ulong id)
@@ -205,7 +205,7 @@ public unsafe struct SteamNetworkingIdentity : IEquatable<SteamNetworkingIdentit
 	/// </summary>
 	public string GetGenericString()
 	{
-		return InteropHelp.PtrToStringUTF8(NativeMethods.SteamAPI_SteamNetworkingIdentity_GetGenericString(ref this));
+		return StringAlloc.CreateCSharpString(NativeMethods.SteamAPI_SteamNetworkingIdentity_GetGenericString(ref this));
 	}
 
 	/// <summary>
@@ -244,7 +244,7 @@ public unsafe struct SteamNetworkingIdentity : IEquatable<SteamNetworkingIdentit
 	{
 		IntPtr buf2 = Marshal.AllocHGlobal(k_cchMaxString);
 		NativeMethods.SteamAPI_SteamNetworkingIdentity_ToString(ref this, buf2, k_cchMaxString);
-		buf = InteropHelp.PtrToStringUTF8(buf2);
+		buf = StringAlloc.CreateCSharpString(buf2);
 		Marshal.FreeHGlobal(buf2);
 	}
 

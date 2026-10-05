@@ -97,7 +97,7 @@ public unsafe struct SteamNetworkingIPAddr : IEquatable<SteamNetworkingIPAddr>
 	{
 		IntPtr buf2 = Marshal.AllocHGlobal(k_cchMaxString);
 		NativeMethods.SteamAPI_SteamNetworkingIPAddr_ToString(ref this, buf2, k_cchMaxString, bWithPort);
-		buf = InteropHelp.PtrToStringUTF8(buf2);
+		buf = StringAlloc.CreateCSharpString(buf2);
 		Marshal.FreeHGlobal(buf2);
 	}
 

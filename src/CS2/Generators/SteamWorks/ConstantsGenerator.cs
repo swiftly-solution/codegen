@@ -57,6 +57,9 @@ internal static class ConstantsGenerator
         "STEAM_PRIVATE_API(",
         "STEAMNETWORKINGSOCKETS_INTERFACE",
         "S_OVERRIDE",
+        "STEAMMATCHMAKING_INTERFACE_VERSION",
+        "STEAMMATCHMAKINGSERVERS_INTERFACE_VERSION",
+        "k_iSteamMatchmakingCallbacks",
         "ControllerAnalogActionData_t",
         "ControllerDigitalActionData_t",
         "ControllerMotionData_t",
@@ -65,6 +68,7 @@ internal static class ConstantsGenerator
     private static readonly HashSet<string> SkippedConstants =
     [
         "k_FriendsGroupID_Invalid",
+        "k_iSteamMatchmakingCallbacks",
         "k_nSteamEncryptedAppTicketSymmetricKeyLen",
         "INVALID_HTMLBROWSER",
         "k_SteamItemInstanceIDInvalid",

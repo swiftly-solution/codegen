@@ -24,6 +24,9 @@ public class SteamworksGenerator : BaseGenerator
         _headersPath = headersPath;
     }
 
+    private static bool IsMatchmakingHeader(string name) =>
+        name is "isteammatchmaking.h" or "matchmakingtypes.h";
+
     /// <inheritdoc />
     public override async Task<GeneratorResult> GenerateFilesAsync()
     {
@@ -35,6 +38,9 @@ public class SteamworksGenerator : BaseGenerator
             Progress.Report("Parsing Steamworks headers...");
             ParserSettings.FakeGameserverInterfaces = true;
             var parser = SteamworksParser.Parse(_headersPath);
+
+            parser.Files.RemoveAll(f => IsMatchmakingHeader(f.Name));
+            parser.Typedefs.RemoveAll(t => IsMatchmakingHeader(t.FileName));
 
             if (Directory.Exists(OutputPath))
                 Directory.Delete(OutputPath, true);
